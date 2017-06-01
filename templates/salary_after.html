@@ -1,0 +1,212 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li><a href="/common/stuff">人员管理</a><li>
+<li  class="active"><a href="#">考勤操作</a></li>
+<li><a href="/common/summary">工资统计</a></li>
+{% endblock%}
+
+{% block content %}
+<!-- <div class="col-sm-9" overflow="auto"> -->
+<p>导入成功</p>
+<button class="btn btn-info" id="reload">重新导入</button>
+<button class="btn btn-info" id="cal">生成工资表</button>
+<table class="table">
+	<thead>
+		<tr class="active">
+			<th>序号</th>
+      		<th>姓名</th>
+      		<th>身份证号</th>
+      		<th>病假</th>
+      		<th>事假</th>
+      		<th>旷工</th>
+      		<th>探亲假</th>
+      		<th>婚丧假</th>
+      		<th>产假</th>
+      		<th>修改</th>
+		</tr>
+	</thead>
+	<tbody id="table01"></tbody>
+</table>
+
+<table class="table">
+	<thead>
+		<tr class="success">
+		    <th>序号</th>
+      		<th>姓名</th>
+      		<th>身份证号</th>
+      		<th>工伤假</th>
+		      <th>其它假</th>
+		      <th>计划生育假</th>
+		      <th>公假</th>
+		      <th>年休假</th>
+		      <th>大夜班</th>
+		      <th>修改</th>
+		</tr>
+	</thead>
+	<tbody id="table02"></tbody>
+</table>
+<table class="table">
+	<thead>
+		<tr class="warning">
+		    <th>序号</th>
+      		<th>姓名</th>
+      		<th>身份证号</th>
+      <th>节假日</th>
+      <th>公休日</th>
+      <th>加点</th>
+      <th>津贴</th>
+      <th>协力工奖励</th>
+      <th>工资订正</th>
+      <th>保险订正</th>
+      <th>修改</th>
+		</tr>
+	</thead>
+	<tbody id="table03"></tbody>
+</table>
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+$('#reload').on('click',function(){
+	location.href = '/common/salary/reupload'
+})
+$('#cal').on('click',function(){
+	$.post('/common/salary/cal',{'0':'0'},function(res){
+		if(res == 'ok'){
+			location.href = '/common/salary/cal'
+		}
+		else{
+			alert('计算错误')
+		}
+	})
+})
+function table_show(){
+	$.getJSON('/common/salary/getbase',function(res){
+		var table01_str = ""
+		var table02_str = ""
+		var table03_str = ""
+		$.each(res,function(ind,val){
+		table01_str += '<tr class="active"><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td>'
+		table01_str += '<td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[6]+'</td><td>'+val[7]+'</td>'
+		table01_str += '<td><button class="btn" id="'+val[1]+'" num="1">修改</button>'
+		table02_str += '<tr class="success"><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[8]+'</td><td>'+val[9]+'</td>'
+		table02_str += '<td>'+val[10]+'</td><td>'+val[11]+'</td><td>'+val[12]+'</td><td>'+val[13]+'</td>'
+		table02_str += '<td><button class="btn" id="'+val[1]+'" num="2">修改</button>'
+		table03_str += '<tr class="warning"><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td>'
+		table03_str += '<td>'+val[16]+'</td><td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]+'</td><td>'+val[20]+'</td>'
+		table03_str += '<td><button class="btn" id="'+val[1]+'" num="3">修改</button>'
+		})
+		$('#table01').html(table01_str)
+		$('#table02').html(table02_str)
+		$('#table03').html(table03_str)
+	})
+}
+table_show()
+ // $.get('/common/salary/getime',function(res){
+ // 	if(res == '1971-01-01'){
+ // 		$('#salary_year').val(year)
+	// 	$('#salary_mon').val(mon)
+	// 	$('#salary_day').val(day)
+	// 	date_sub = year+'-'+mon+'-'+day
+ // 	}
+ // 	else{
+ // 		var datelist = res.split('-')
+ // 		$('#salary_year').val(datelist[0])
+ // 		$('#salary_year').attr('disabled','')
+ // 		$('#salary_mon').val(datelist[1])
+ // 		$('#salary_mon').attr('disabled','')
+ // 		$('#salary_day').val(datelist[2])
+ // 		$('#salary_day').attr('disabled','')
+ // 		date_sub = res
+ // 	}
+ // })
+//var date_sub = year+'-'+mon+'-'+day
+function setsalary(setclass){//这是除考核之外的其余值的修改，发现修改就产生提交，因为所有的值需要*100，考核不用，所以考核单写
+	$(document).on('change','.'+setclass,function(){
+		var id = $(this).parents().filter('tr').attr('pk')
+	//console.log(id)
+		var val = $(this).val()
+		if(val.length==0){
+			$(this).val(0)
+		}
+		else {
+			$.post('/common/salary/set',{'col':setclass,'id':id,'val':parseInt(val)*100},function(res){
+				if(res == 'ok'){
+
+			}
+			else{
+				alert('数据同步失败')
+			}
+		})
+		}
+		})
+	}
+
+
+// $.getJSON('/common/salary/getbase',function(res){//查询表中的内容
+// 	var str = ''
+// 	$.each(res,function(ind,val){
+// 		// str += '<tr pk="'+val[0]+'"><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control another" value="'+val[3]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control drawback" value="'+val[4]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit01" value="'+val[5]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit02" value="'+val[6]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit03" value="'+val[7]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[8]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[9]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[10]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[11]+'"></div></td></tr>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[12]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[13]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[14]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[15]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[16]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[17]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[18]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[19]+'"></div></td>'
+// 		// str += '<td><div class="form-group"><input type="text" class="form-control benefit04" value="'+val[20]+'"></div></td></tr>'
+// 	})
+// 	$('#table').html(str)
+// })
+setsalary('drawback')//这几个就是借用函数提交修改的
+setsalary('another')
+setsalary('benefit01')
+setsalary('benefit02')
+setsalary('benefit03')
+setsalary('benefit04')
+$(document).on('change','.exam',function(){//因为考核这一栏不需要*100，所以就单写了
+	var id = $(this).parents().filter('tr').attr('pk')
+	//console.log(id)
+	var val = $(this).val()
+	if(val.length==0){
+		$(this).val(0)
+	}
+	else {
+		$.post('/common/salary/set',{'col':'exam','id':id,'val':parseInt(val)},function(res){
+			if(res == 'ok'){
+
+			}
+			else{
+				alert('数据同步失败')
+			}
+		})
+	}
+})
+$('#salary_cal').on('click',function(){
+	$.post('/common/salary/cal',{'date':date_sub},function(res){
+		if(res=='ok'){
+			alert('操作成功')
+			window.location.href='/common/salary'
+		}
+		else{
+			alert('操作失败')
+		}
+	})
+})
+
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>序号</th>
+      <th>姓名</th>
+      <th>出生日期</th>
+      <th>曾用名</th>
+      <th>性别</th>
+      <th>名族</th>
+      <th>年龄</th>
+      <th>身份证</th>
+      <th>政治面貌</th>
+      <th>学历</th>
+      <th>健康状况</th>
+      <th>户口</th>
+      <th>婚否</th>
+      <th>籍贯</th>
+      <th>户口所在地</th>
+      <th>住宅电话</th>
+      <th>个人电话</th>
+      <th>工作时间</th>
+      <th>住址01</th>
+      <th>住址02</th>
+      <th>公司</th>
+      <th>工作状态</th>
+      <th>部门</th>
+      <th>工种</th>
+      <th>进入公司时间</th>
+      <th>劳务派遣公司</th>
+      <th>集团部门</th>
+      <th>人员序列</th>
+      <th>联系人</th>
+      <th>联系电话</th>
+      <th>津贴性质</th>
+      <th>津贴标准</th>
+      <th>享受标准</th>
+      <th>工作班制</th>
+      <th>基本公司</th>
+      <th>高温补助基数</th>
+      <th>特殊补贴基数</th>
+      <th>班组长津贴</th>
+      <th>年工工资</th>
+      <th>餐补基数</th>
+      <th>社保基数</th>
+      <th>医保基数</th>
+      <th>其它</th>
+    </tr>
+  </thead>
+  <tbody id="table">
+  </tbody>
+</table>
+
+<script>
+  function getable(){
+    var str = ''
+    $.getJSON('/common/stuff/get',function(res){
+      $.each(res,function(ind,val){
+        str += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[6]+'</td><td>'+val[7]+'</td><td>'+val[8]+'</td><td>'+val[9]
+        str += '<tr><td>'+val[10]+'</td><td>'+val[11]+'</td><td>'+val[12]+'</td><td>'+val[13]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[16]+'</td><td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]
+        str += '<tr><td>'+val[20]+'</td><td>'+val[21]+'</td><td>'+val[22]+'</td><td>'+val[23]+'</td><td>'+val[24]+'</td><td>'+val[25]+'</td><td>'+val[26]+'</td><td>'+val[27]+'</td><td>'+val[28]+'</td><td>'+val[29]
+        str += '<tr><td>'+val[30]+'</td><td>'+val[31]+'</td><td>'+val[32]+'</td><td>'+val[33]+'</td><td>'+val[34]+'</td><td>'+val[35]+'</td><td>'+val[36]+'</td><td>'+val[37]+'</td><td>'+val[38]+'</td><td>'+val[39]
+        str += '<tr><td>'+val[40]+'</td><td>'+val[41]+'</td><td>'+val[42]+'</td><td>'
+        str += '<td><button class="btn btn-info btn-xs update-btn" id="'+val[0]+'">修改</button>'
+        str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[0]+'">删除</button></td></tr>'
+      })
+      $('#table').html(str)
+    })
+  }
+  getable()
+
+  </script>
+
+  这里要注意的是，过程中使用的变量一定不能与表中的列名重合，包括大小写!!!!!!
+create procedure salary_cal (company_id tinyint unsigned,base_c_cal mediumint unsigned,time_cal timestamp) 
+begin
+declare id_i_cal smallint unsigned;
+declare  name_cal varchar(12);
+declare salary_cal  mediumint unsigned;
+declare another_cal mediumint unsigned;
+declare drawback_cal mediumint unsigned;
+declare benefit01_cal mediumint unsigned;
+declare benefit02_cal mediumint unsigned;
+declare benefit03_cal mediumint unsigned;
+declare benefit04_cal mediumint unsigned;
+declare exam_cal tinyint unsigned;
+declare base_i_cal mediumint unsigned;
+declare endow_i_cal mediumint unsigned;
+declare endow_c_cal mediumint unsigned;
+declare unemploy_i_cal mediumint unsigned;
+declare unemploy_c_cal mediumint unsigned;
+declare medical_i_cal mediumint unsigned;
+declare medical_c_cal mediumint unsigned;
+declare injury_i_cal mediumint unsigned;
+declare injury_c_cal mediumint unsigned;
+declare house_i_cal mediumint unsigned;
+declare house_c_cal mediumint unsigned;
+declare individual_cal mediumint unsigned;
+declare actual_cal float;
+declare profit_cal float;
+declare tmp_cal mediumint unsigned;
+declare done int default 0;
+declare cur01 cursor for (select ID_I,NAME,SALARY ,ANOTHER,DRAWBACK,BENEFIT01,BENEFIT02,BENEFIT03,BENEFIT04,EXAM from stuff_set_i  where company=company_id);
+declare continue handler for sqlstate '02000' set done = 1;
+start transaction;
+delete from salary_temp where ID_I in (select ID_I from stuff where COMPANY=company_id);
+open cur01;
+fetch cur01 into id_i_cal,name_cal,salary_cal,another_cal,drawback_cal,benefit01_cal,benefit02_cal,benefit03_cal,benefit04_cal,exam_cal;
+while not done do
+set base_i_cal = salary_cal*(1-exam_cal/100);
+set endow_i_cal = base_i_cal*0.08;
+set endow_c_cal = base_i_cal*0.2;
+set unemploy_i_cal = base_i_cal*0.01;
+set unemploy_c_cal = base_i_cal*0.02;
+set medical_i_cal = base_i_cal*0.02+1000;
+set medical_c_cal = base_i_cal*0.08;
+set injury_i_cal = 0;
+set injury_c_cal = base_i_cal*0.005;
+set house_i_cal = base_i_cal*0.08;
+set house_c_cal = base_i_cal*0.08;
+set tmp_cal = base_i_cal-endow_i_cal-unemploy_i_cal-medical_i_cal-injury_i_cal-house_i_cal-another_cal+drawback_cal+benefit01_cal+benefit02_cal+benefit03_cal+benefit04_cal;
+if tmp_cal <= 350000 then set individual_cal = 0;
+elseif tmp_cal <= 500000 then set individual_cal = (tmp_cal-350000)*0.03;
+elseif tmp_cal <= 800000 then set individual_cal = (tmp_cal-500000)*0.1+10500+4500;
+else set individual_cal = (tmp_cal-800000)*0.2+55500+45000+4500;
+end if;
+set actual_cal = tmp_cal - individual_cal;
+set profit_cal = base_c_cal - base_i_cal - endow_c_cal - unemploy_c_cal - medical_c_cal - injury_c_cal - house_c_cal;
+insert into salary_temp(ID_I,TIME,BASE_C,BASE_I,ENDOWMENT_C,ENDOWMENT_I,UNEMPLOYMENT_C,UNEMPLOYMENT_I,MEDICAL_C,MEDICAL_I,INJURY_C,INJURY_I,HOUSING_C,HOUSING_I,INDIVIDUAL,ANOTHER,DRAWBACK,BENEFIT01,BENEFIT02,BENEFIT03,BENEFIT04,ACTUAL,PROFIT) values(id_i_cal,time_cal,base_c_cal,base_i_cal,endow_c_cal,endow_i_cal,unemploy_c_cal,unemploy_i_cal,medical_c_cal,medical_i_cal,injury_c_cal,injury_i_cal,house_c_cal,house_i_cal,individual_cal,another_cal,drawback_cal,benefit01_cal,benefit02_cal,benefit03_cal,benefit04_cal,actual_cal,profit_cal);
+fetch cur01 into  id_i_cal,name_cal,salary_cal,another_cal,drawback_cal,benefit01_cal,benefit02_cal,benefit03_cal,benefit04_cal,exam_cal;
+end while;
+close cur01;
+commit;
+ end //
+

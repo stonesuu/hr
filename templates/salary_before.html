@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li><a href="/common/stuff">人员管理</a><li>
+<li  class="active"><a href="#">考勤操作</a></li>
+<li><a href="/common/summary">查看考勤信息</a></li>
+<li><a href="#">查看工资信息</a></li>
+{% endblock%}
+
+{% block content %}
+<!-- <div class="col-sm-9" overflow="auto"> -->
+ <form method="post" action="/common/salary" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="exampleInputFile">选择文件</label>
+    <input type="file" name="check_file">
+  </div>
+<button type="submit" class="btn btn-default">上传</button>
+ </form>
+ {% endblock %}

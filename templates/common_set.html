@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li><a href="/common/stuff">人员管理</a><li>
+<li><a href="/common/salary">考勤操作</a></li>
+<li><a href="#">查看考勤信息</a></li>
+<li><a href="#">查看工资表</a></li>
+<li><a href="/common/summary/table">报表管理</a></li>
+<li class="active"><a href="#">设置</a></li>
+{% endblock%}
+
+{% block content %}
+<div class="container-fluid">
+<div class="row">
+  	<h3>部门管理</h3>
+  	<div class="col-md-6">
+		<table class="table table-striped">
+  			<theader>
+  				<th>序号</th>
+  				<th>名称</th>
+  				<th>操作</th>
+  			</theader>
+  			<tbody id="department"></tbody>
+  		</table>
+	</div>
+	<div class="col-md-4">
+  		<button class="btn btn-success">添加部门</button>
+	</div>
+</div>
+<div class="row">
+	<h3>比例调整</h3>
+	<div class="col-md-6">
+		<table class="table table -striped">
+			<theader>
+				<th>序号</th>
+				<th>名称</th>
+				<th>操作</th>
+			</theader>
+			<tbody id="set"></tbody>
+		</table>
+	</div>
+</div>
+
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+function getable(){
+	$.getJSON('/common/set/depart_get',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td>'
+			str += '<td><button class="btn btn-success btn-xs check-btn" id="'+val[0]+'">查看</button>'
+        	str += '<button class="btn btn-info btn-xs update-btn" id="'+val[0]+'" >修改</button>'
+        	str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[0]+'">删除</button></td></tr>'
+		})
+		$('#department').html(str)
+	})
+}
+getable()
+</script>
+{% endblock %}
