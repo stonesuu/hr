@@ -263,3 +263,63 @@ end while;
 close cur01;
 commit;
 end//
+
+
+
+	-- select count(*) into stf_sum_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+	-- select sum(salary_sum) into sum_salary_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+	-- select sum(BX_XJ) into BX_XJ_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+	-- select sum(YL_C) into YL_C_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+	-- select sum(YL_I) into YL_I_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+	-- select sum(SY_C) into sum_salary_cal from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+
+create procedure baobiao_cal(sum_count_input float(11,2),ticket_input float(11,2),pro_tool_input float(11,2),other_input float(11,2),QYSDS_input float(11,2),department_input varchar(20),date_input datetime)
+begin
+declare stf_num_cal int;
+declare sum_salary_cal float(11,2);
+declare BX_XJ_cal float(11,2);
+declare YL_C_cal float(11,2);
+declare YL_I_cal float(11,2);
+declare YL_cal float(11,2);
+declare SY_C_cal float(11,2);
+declare SY_I_cal float(11,2);
+declare SY_cal float(11,2);
+declare GS_C_cal float(11,2);
+declare YB_C_cal float(11,2);
+declare YB_I_cal float(11,2);
+declare YB_cal float(11,2);
+declare BI_C_cal float(11,2);
+declare SI_C_cal float(11,2);
+declare SH_XJ_cal float(11,2);
+declare ZZS_cal float(11,2);
+declare CJS_cal float(11,2);
+declare JYS_cal float(11,2);
+declare FJS_cal float(11,2);
+declare output_sum_cal float(11,2);
+declare last_cal float(11,2);
+create temporary table salary_cal_tmp select * from salary_all where id in (select id from stuff where department=department_input) and date=date_input;
+select count(*) into stf_num_cal from salary_cal_tmp;
+select sum(salary_sum) into sum_salary_cal from salary_cal_tmp;
+select sum(YL_C) into YL_C_cal from salary_cal_tmp;
+select sum(YL_I) into YL_I_cal from salary_cal_tmp;
+select sum(SY_C) into SY_C_cal from salary_cal_tmp;
+select sum(SY_I) into SY_I_cal from salary_cal_tmp;
+select sum(GS_C) into GS_C_cal from salary_cal_tmp;
+select sum(YB_C) into YB_C_cal from salary_cal_tmp;
+select sum(YB_I) into YB_I_cal from salary_cal_tmp;
+select sum(BI_C) into BI_C_cal from salary_cal_tmp;
+select sum(SI_C) into SI_C_cal from salary_cal_tmp;
+set BX_XJ_cal = YL_C_cal+YL_I_cal+SY_C_cal+SY_I_cal+GS_C_cal+YB_C_cal+YB_I_cal+BI_C_cal+SI_C_cal;
+set YL_cal = YL_C_cal+YL_I_cal;
+set SY_cal = SY_C_cal+SY_I_cal;
+set YB_cal = YB_C_cal+YB_I_cal+SI_C_cal;
+set ZZS_cal = sum_count_input*0.06/1.06;
+set CJS_cal = ZZS_cal*7;
+set JYS_cal = ZZS_cal*3;
+set FJS_cal = ZZS_cal*2;
+set SH_XJ_cal = ZZS_cal+CJS_cal+JYS_cal+FJS_cal+QYSDS_input;
+set output_sum_cal = sum_salary_cal+BX_XJ_cal+SH_XJ_cal+ticket_input+pro_tool_input+other_input;
+set last_cal = sum_count_input-output_sum_cal;
+drop table salary_cal_tmp;
+insert into baobiao values(department_input,date_input,stf_num_cal,sum_count_input,sum_salary_cal,BX_XJ_cal,YL_cal,SY_cal,GS_C_cal,YB_cal,BI_C_cal,SH_XJ_cal,ZZS_cal,CJS_cal,JYS_cal,FJS_cal,QYSDS_input,ticket_input,pro_tool_input,other_input,output_sum_cal,last_cal);
+end//
