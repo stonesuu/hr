@@ -108,9 +108,9 @@ def get_time():
 	month = cur.month
 	day = cur.day
 	if month != 1:
-		return ('%s-%s-%s' %(year,month,day),'%s-%s-01' %(year,month-1))
+		return ('%s-%s-%s' %(year,month,day),'%s-%s' %(year,month-1))
 	else:
-		return ('%s-%s-%S' %(year,month,day),'%s-12-01' %(year-1,))
+		return ('%s-%s-%S' %(year,month,day),'%s-12' %(year-1,))
 
 
 
@@ -131,16 +131,10 @@ def upload():
         	res = excel_to_db_stuff(ab_path_file)
         	return res
 
-# @app.route('/common/salary/upload',methods=['POST'])
-# def com_sal_up():
-# 	file = request.files['check_file']
-# 	print file
-# 	if file and allowed_file(file.filename):
-# 		file = file.name
-# 		ab_path_file = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-#     	file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#         #return redirect(url_for('uploaded_file',filename=filename))
-#         return 'ok'
+@app.route('/getime')#供所有页面获取时间，调用get_time函数
+def getime():
+	res = get_time()
+	return json.dumps(res)
 
 @app.route('/')
 def login_r():
@@ -256,21 +250,7 @@ def com_stuff_get():
 # 	else:
 # 		return 'error'
 
-# @app.route('/common/stuff/update',methods=['POST'])
-# def com_stuff_upd():
-# 	ID_I = request.form.get('id')
-# 	name = request.form.get('name')
-# 	sex = request.form.get('sex')
-# 	age = request.form.get('age')
-# 	tele = request.form.get('tele')
-# 	address = request.form.get('address')
-# 	salary = request.form.get('salary')
-# 	sql = "UPDATE stuff SET NAME='%s',SEX='%s',AGE=%s,TEL='%s',ADDRESS='%s',SALARY=%s WHERE ID_I=%s" %(name,sex,age,tele,address,salary,ID_I)
-# 	res = conn.execute(sql)
-# 	if not res:
-# 		return 'ok'
-# 	else:
-# 		return 'error'
+
 
 # @app.route('/common/salary/getime')
 # def com_salary_gt():
@@ -339,8 +319,8 @@ def com_salary_set():
 	else:
 		return 'error'
 
-@app.route('/common/salary/cal',methods=['GET','POST'])
-def com_salary_cal():
+@app.route('/common/salary/cal',methods=['GET','POST'])#salary_after.html中，cal按钮先post提交到这，调用存储过程，再
+def com_salary_cal():                                 #location.href = '/common/salary/cal'到这里，展示页面
 	if request.method == 'POST':
 		sql = "call hr_salary_cal()"
 		res = conn.execute(sql)
@@ -351,7 +331,7 @@ def com_salary_cal():
 	else:
 		return render_template('salary_cal.html')
 
-@app.route('/common/salary/get_cal')
+@app.route('/common/salary/get_cal')#这是salary_cal.html页面上提交的展示整个工资表的视图
 def com_salary_gc():
 	sql = '''select name,t.id,ZG,a.base_salary,salary_XJ,check_salary,high_temp_salary,
 	special_job_salary,a.leader_salary,add_job_salary,a.age_salary,night_job_salary,meal_salary,
@@ -391,11 +371,52 @@ def com_sum_chk():
 def com_sum_sal():
 	return 'pass'
 
-@app.route('/common/summary/table',methods=['GET','POST'])
+@app.route('/common/summary/table',methods=['GET','POST'])#显示报表的页面
 def com_sum_table():
 	if request.method == 'GET':
 		if 'user' in session:
 			return render_template('summary_table.html')
+
+@app.route('/common/summary/table_get',methods=['GET','POST'])#GET:summary_table页面，getable函数请求的内容，展示简化报表
+def com_sum_tabget():
+	if request.method == 'GET':
+		sql = '''select department,date_format(date,"%Y-%m-%d"),stf_num,sum_count,sum_salary,BX_XJ,YL,SY,GS,YB,
+		BI,SH_XJ,ZZS,CJS,JYS,FJS,QYSDS,ticket,protect_tool,other,output_sum,last from baobiao order by 
+		department,date desc
+		'''
+		res = getjson(sql)
+		return res
+	else:
+		department
+@app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,button'#submit',使用baibiao_cal存储过程计算报表内容
+def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中
+	if request.method == 'GET':
+		pass
+	else:
+		department = request.form.get('department')
+		sum_count_input = request.form.get('sum_count_input')
+		QYSDS_input = request.form.get('QYSDS_input')
+		ticket_input = request.form.get('ticket_input')
+		pro_tool_input = request.form.get('pro_tool_input')
+		other_input = request.form.get('other_input')
+		date = '%s-01' % (get_time()[1])
+		sql = 'call baobiao_cal(%s,%s,%s,%s,%s,"%s","%s")' %(sum_count_input,ticket_input,pro_tool_input,other_input,QYSDS_input,department,date)
+		try:
+			print sql
+			conn.cursor.execute(sql)
+		except Exception as e:
+			print e
+			return 'error'
+		else:
+			return 'ok'
+@app.route('/common/summary/table_sub',methods=['GET','POST'])
+def com_sum_tabsub():
+	if request.method == 'GET':
+		pass
+	else:
+		sql = 'baobiao_sub()'
+		return 'ok'
+
 
 @app.route('/common/set',methods=['GET','POST'])
 def com_set():
@@ -406,6 +427,7 @@ def com_set():
 def com_set_depget():
 	sql = 'select id,name from department'
 	res = getjson(sql)
+	#print res
 	return res
 
 

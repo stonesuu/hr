@@ -10,9 +10,172 @@
 {% endblock%}
 
 {% block content %}
+<div class="container-fluid">
+<div class="row">
+  		<div class="col-md-6">
+  		<form>
+		  <div class="form-group">
+		    <label>当前日期</label>
+			<input type="datetime" id="date_now" class="form-control" disabled>
+		  </div>
+		  </form>
+		</div>
+		<div class="col-md-6">
+  		<form>
+		  <div class="form-group">
+		    <label>计算日期</label>
+			<input type="datetime" id="date_cal" class="form-control" disabled>
+		  </div>
+		  </form>
+		</div>
+</div>
+  <div class="row">
+
+  		<div class="col-md-6">
+  		<form>
+		  <div class="form-group">
+		    <label>部门</label>
+		    <select class="form-control" id="department">
+		    </select>
+		  </div>
+		  </form>
+		</div>
+</div>
+
+<div class="row">
+		  <div class="col-md-6">
+		  <form>
+		      <div class="form-group">
+		        <label>月度进账合计</label>
+		          <input type="number" id="sum_count_input" class="form-control">
+		        </div>
+		</form>
+		</div>
+
+		  <div class="col-md-6">
+		  <form>
+		  <div class="form-group">
+		    <label>企业所得税</label>
+		    <input type="number" id="QYSDS_input" class="form-control">
+		  </div>
+		</form>
+		</div>
+</div>
+
+<div class="row">
+		  <div class="col-md-4">
+		  <form>
+		  <div class="form-group">
+		    <label>乘车月票</label>
+		    <input type="number" id="ticket_input" class="form-control">
+		  </div>
+		</form>
+		</div>
+
+
+		  <div class="col-md-4">
+		  <form>
+		  <div class="form-group">
+		    <label>劳保</label>
+		    <input type="number" id="pro_tool_input" class="form-control">
+		  </div>
+		</form>
+		</div>
+
+		<div class="col-md-4">
+		<form>
+		  <div class="form-group">
+		    <label>其它</label>
+		    <input type="number" id="other_input" class="form-control">
+		  </div>
+		</form>
+		</div>
+</div>
+
+<div class="row">
+<button class="btn btn-success" id="submit">产生表报</button>
+</div>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>部门</th>
+      <th>日期</th>
+      <th>人数</th>
+      <th>月度进账</th>
+      <th>员工工资</th>
+      <th>保险小计</th>
+      <th>税金小计</th>
+      <th>支出小计</th>
+      <th>剩余利润</th>
+    </tr>
+  </thead>
+  <tbody id="table">
+  </tbody>
+</table>
+<button class="btn btn-info" id="juti">显示完整表格</button>
+
 {% endblock %}
 
 {% block js %}
 <script>
+function getable(){
+	$.getJSON('/common/summary/table_get',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<tr><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td>'
+			str += '<td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[11]+'</td><td>'+val[20]+'</td>'
+			str += '<td>'+val[21]+'</td></tr>'
+		})
+		$('#table').html(str)
+	})
+}
+getable()
+function getime(){
+	$.getJSON('/getime',function(res){
+		$('#date_now').val(res[0])
+		$('#date_cal').val(res[1])
+	})
+}
+getime()
+function getdepart(){
+	$.getJSON('/common/set/depart_get',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<option>'+val[1]+'</option>'
+		})
+		console.log(str)
+		$('#department').html(str)
+	})
+}
+getdepart()
+function forminit(){
+	$('#sum_count_input').val(0)
+	$('#QYSDS_input').val(0)
+	$('#ticket_input').val(0)
+	$('#pro_tool_input').val(0)
+	$('#other_input').val(0)
+}
+forminit()
+$('#submit').on('click',function(){
+	var department = $('#department').val()
+	var sum_count_input = $('#sum_count_input').val()
+	var QYSDS_input = $('#QYSDS_input').val()
+	var ticket_input = $('#ticket_input').val()
+	var pro_tool_input = $('#pro_tool_input').val()
+	var other_input = $('#other_input').val()
+	if(sum_count_input=='' || QYSDS_input=='' || ticket_input=='' || pro_tool_input=='' || other_input=='')
+		alert('你有一个表单没有输入')
+	$.post('/common/summary/table_cal',{'department':department,'sum_count_input':sum_count_input,'QYSDS_input':QYSDS_input,'ticket_input':ticket_input,'pro_tool_input':pro_tool_input,'other_input':other_input},function(res){
+	if(res == 'ok'){
+		alert('操作成功')
+		getable()
+	}
+	else{
+		alert('操作失败')
+	}
+})
+})
 </script>
 {% endblock %}

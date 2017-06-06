@@ -321,5 +321,6 @@ set SH_XJ_cal = ZZS_cal+CJS_cal+JYS_cal+FJS_cal+QYSDS_input;
 set output_sum_cal = sum_salary_cal+BX_XJ_cal+SH_XJ_cal+ticket_input+pro_tool_input+other_input;
 set last_cal = sum_count_input-output_sum_cal;
 drop table salary_cal_tmp;
-insert into baobiao values(department_input,date_input,stf_num_cal,sum_count_input,sum_salary_cal,BX_XJ_cal,YL_cal,SY_cal,GS_C_cal,YB_cal,BI_C_cal,SH_XJ_cal,ZZS_cal,CJS_cal,JYS_cal,FJS_cal,QYSDS_input,ticket_input,pro_tool_input,other_input,output_sum_cal,last_cal);
+delete from baobiao_once where department=department_input and date=date_input;
+insert into baobiao_once values(department_input,date_input,stf_num_cal,sum_count_input,sum_salary_cal,BX_XJ_cal,YL_cal,SY_cal,GS_C_cal,YB_cal,BI_C_cal,SH_XJ_cal,ZZS_cal,CJS_cal,JYS_cal,FJS_cal,QYSDS_input,ticket_input,pro_tool_input,other_input,output_sum_cal,last_cal);
 end//
