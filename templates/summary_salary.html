@@ -3,8 +3,8 @@
 {% block sidebar %}
 <li><a href="/common/stuff">人员管理</a><li>
 <li><a href="/common/salary">考勤操作</a></li>
-<li class="active"><a href="#">查看考勤信息</a></li>
-<li><a href="/common/summary/salary">查看工资表</a></li>
+<li><a href="/common/summary/check">查看考勤信息</a></li>
+<li class="active"><a href="#">查看工资表</a></li>
 <li><a href="/common/summary/table">报表管理</a></li>
 <li><a href="/common/set">设置</a></li>
 {% endblock%}
@@ -70,13 +70,16 @@
       	<th>姓名</th>
       	<th>身份证</th>
       	<th>部门</th>
-      	<th>大夜班</th>
-      	<th>节假日</th>
-      	<th>公休日</th>
-      	<th>加点</th>
-      	<th>津贴天数</th>
-      	<th>协力工奖励</th>
+      	<th>基本工资</th>
+      	<th>加班费</th>
+      	<th>夜班费</th>
+      	<th>协力津贴</th>
+      	<th>应发合计</th>
+      	<th>保险小计</th>
+      	<th>个税</th>
+      	<th>实发合计</th>
       	<th>日期</th>
+      	<th>姓名</th>
       </thead>
       <tbody id="table">
       </tbody>

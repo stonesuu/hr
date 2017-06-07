@@ -6,7 +6,7 @@ from flask import Flask,session,request,render_template,redirect,json,url_for
 import dbutil,time
 from werkzeug import secure_filename
 try:
-	conn = dbutil.DB('hr','10.99.160.36','root','root')
+	conn = dbutil.DB('hr','192.168.199.12','root','root')
 	conn.connect()
 except Exception as e:
 	print e
@@ -76,6 +76,7 @@ def excel_to_db_stuff(file):
 			return '-1'
 		else:
 			return '1'
+
 def excel_to_check(file):
 	book = xlrd.open_workbook(file)
 	sheet = book.sheet_by_index(0)
@@ -111,8 +112,6 @@ def get_time():
 		return ('%s-%s-%s' %(year,month,day),'%s-%s' %(year,month-1))
 	else:
 		return ('%s-%s-%S' %(year,month,day),'%s-12' %(year-1,))
-
-
 
 
 
@@ -363,24 +362,98 @@ def com_salary_sub():
 		conn.cursor.execute('commit')
 		session.pop('check_upload')
 		return 'ok'
+#查看考勤表
 @app.route('/common/summary/check')#显示summary_check页面，显示的是考勤信息
-def com_sum_chk():
+def com_sum_chk():                 #在summary_check_bigtable页面的#return按钮也能触发
 	return render_template('summary_check.html')
 
-@app.route('/common/summary/check/select')
-def com_sum_check_select():
-	string = request.args.get('arr')
-	date_start = request.args.get('date_start')
-	date_end = request.args.get('date_end')
-	department = request.args.get('department')
-	name = request.args.get('nam')
-	idcard = request.args.get('id')
-	arr = string.split(',')
-	return 'ok'
+@app.route('/common/summary/check/bigtable')#显示summary_check_bigtable页面，由summary_check的#bigtable按钮触发。
+def com_sum_check_bigtable():
+	return render_template('summary_check_bigtable.html')
 
+@app.route('/common/summary/check/select')#summary_check页面，查询操作，将查询的json值存入session中，如果不是重新查询或者重新登录，能够快速使用
+def com_sum_check_select():
+	if 'user' in session:
+		string = str(request.args.get('str'))
+		date_start = request.args.get('date_start')
+		date_end = request.args.get('date_end')
+		department = request.args.get('department')
+		name = request.args.get('name')
+		idcard = request.args.get('id')
+		#print string
+		arr = string.split(',')
+		#print arr
+		sql01 = '''select id,name,department,BJ,SJ,KG,TQJ,HSJ,CJ,GSJ,QTJ,JHSYJ,GJ,NXJ,
+		full_night_job,holiday_job,sunday_job,add_job,JT_days,reward_salary,check_salary,
+		BX_check,date_format(date,"%Y-%m") from check_all_stuff where
+		'''
+		sql02 = 'date between "%s-01" and "%s-01"' % (date_start,date_end)
+		sql03 = 'and department="%s"' % (department)
+		sql04 = 'and name="%s"' % (name)
+		sql05 = 'and id="%s"' % (idcard)
+		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])
+		#print sql
+		#res = getjson(sql)
+		res = conn.execute(sql)
+		session['check'] = res
+		return json.dumps(res)
+	else:
+		return redirect('/signin')
+
+@app.route('/common/summary/check/select_session')#summary_check页面，检查session中是否存在session['check'],如果存在，就直接从session中读取。
+def com_sum_check_selectsession():
+	if 'user' in session:
+		if 'check' in session:
+			res = session['check']
+			print len(res)
+			return json.dumps(res)
+		else:
+			return ''
+	else:
+		return redirect('/signin')
+#查看工资表
 @app.route('/common/summary/salary')
-def com_sum_sal():
-	return 'pass'
+def com_sum_salary():
+	if 'user' in session:
+		return render_template('summary_salary.html')
+
+@app.route('/common/summary/salary/bigtable')#显示summary_salary_bigtable页面，由summary_salary的#bigtable按钮触发。
+def com_sum_salary_bigtable():
+	if 'user' in session:
+		return render_template('summary_salary_bigtable.html')
+	else:
+		return redirect('/signin')
+
+@app.route('/common/summary/salary/select')#summary_check页面，查询操作，将查询的json值存入session中，如果不是重新查询或者重新登录，能够快速使用
+def com_sum_salary_select():
+	if 'user' in session:
+		string = str(request.args.get('str'))
+		date_start = request.args.get('date_start')
+		date_end = request.args.get('date_end')
+		department = request.args.get('department')
+		name = request.args.get('name')
+		idcard = request.args.get('id')
+		#print string
+		arr = string.split(',')
+		#print arr
+		sql01 = '''select id,name,department,base_salary,salary_XJ,check_salary,high_temp_salary,special_job_salary,
+		leader_salary,add_job_salary,age_salary,night_job_salary,meal_salary,env_salary,reward_salary,salary_get,
+		SB_base,YB_base,YL_C,YL_I,SY_C,SY_I,GS_C,YB_C,YB_I,BI_C,SI_C,BX_check,BX_XJ,tex,salary_sum,date from
+		check_all_stuff where
+		'''
+		sql02 = 'date between "%s-01" and "%s-01"' % (date_start,date_end)
+		sql03 = 'and department="%s"' % (department)
+		sql04 = 'and name="%s"' % (name)
+		sql05 = 'and id="%s"' % (idcard)
+		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])
+		#print sql
+		#res = getjson(sql)
+		res = conn.execute(sql)
+		session['salary'] = res
+		return json.dumps(res)
+	else:
+		return redirect('/signin')
+
 
 @app.route('/common/summary/table',methods=['GET','POST'])#GET：显示summary_table页面
 def com_sum_table():
@@ -403,7 +476,7 @@ def com_sum_tabget():                                         #summary_bigtable�
 		res = getjson(sql)
 		return res
 	else:
-		department
+		pass
 # @app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,button'#submit',使用baibiao_cal存储过程计算报表内容
 # def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中
 # 	if request.method == 'GET':
