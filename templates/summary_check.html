@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li><a href="/common/stuff">人员管理</a><li>
+<li><a href="/common/salary">考勤操作</a></li>
+<li class="active"><a href="#">查看考勤信息</a></li>
+<li><a href="/common/summary/salary">查看工资表</a></li>
+<li><a href="/common/summary/table">报表管理</a></li>
+<li><a href="/common/set">设置</a></li>
+{% endblock%}
+
+{% block content %}
+<div class=".container-fluid">
+	<div class="row">
+		<div class="col-md-3">
+  		<form>
+		  <div class="form-group">
+		    <label>起始日期</label>
+		    <input type="datetime" id="date_start" class="form-control">
+		  </div>
+		  </form>
+		</div>
+
+		<div class="col-md-3">
+  		<form>
+		  <div class="form-group">
+		    <label>结束日期</label>
+		    <input type="datetime" id="date_end" class="form-control">
+		  </div>
+		  </form>
+		</div>
+
+		 <div class="col-md-3">
+  		<form>
+		  <div class="form-group">
+		    <label>部门</label>
+		    <select class="form-control" id="department">
+		    </select>
+		  </div>
+		  </form>
+		</div>
+	</div>
+
+	<div class="row">
+			<div class="col-md-3">
+  		<form>
+		  <div class="form-group">
+		    <label>姓名</label>
+		    <input type="text" id="name" class="form-control">
+		  </div>
+		  </form>
+		</div>
+
+		<div class="col-md-3">
+  		<form>
+		  <div class="form-group">
+		    <label>身份证号</label>
+		    <input type="text" id="id" class="form-control">
+		  </div>
+		  </form>
+		</div>
+
+		<div class="col-md-3 col-md-offset-3">
+		<button class="btn btn-success" id="select">显示</button>
+		</div>
+	</div>
+    <table class="table table-striped">
+      <thead>
+      	<th>序号</th>
+      	<th>姓名</th>
+      	<th>部门</th>
+      	<th>大夜班</th>
+      	<th>节假日</th>
+      	<th>公休日</th>
+      	<th>加点</th>
+      	<th>津贴天数</th>
+      	<th>协力工奖励</th>
+      </thead>
+      <tbody id="table">
+      </tbody>
+      </table>
+
+      <button class="btn btn-success">查看完整表</button>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+$.getJSON('/common/summary/check/get_time',function(res){
+	var str = ''
+	$.each(res,function(ind,val){
+		str += '<label><input type="checkbox" value="'+val[0]+'">'+val[0]+'</label>'
+	})
+	$('#date').html(str)
+})
+//函数与summary_table页面的函数基本相同，只有设置目标不同
+function getime(){
+	$.getJSON('/getime',function(res){
+		$('#date_start').val(res[1])
+		$('#date_end').val(res[1])
+	})
+}
+getime()
+$('#date_start').datetimepicker({
+	language:'zh-CN',
+    format:'yyyy-mm',
+    minView:3,
+    todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 3,
+    });
+$('#date_end').datetimepicker({
+	language:'zh-CN',
+    format:'yyyy-mm',
+    minView:3,
+    todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 3,
+    });
+//与summary_table页面的函数基本相同，唯一区别是str的初始值，这里初始值是所有部门
+function getdepart(){
+	$.getJSON('/common/set/depart_get',function(res){
+		var str = '<option>所有部门</option>'
+		$.each(res,function(ind,val){
+			str += '<option>'+val[1]+'</option>'
+		})
+		//console.log(str)
+		$('#department').html(str)
+	})
+}
+getdepart()
+$('#select').on('click',function(){
+	var date_start = $('#date_start').val()
+	var date_end = $('#date_end').val()
+	var department = $('#department').val()
+	var name = $('#name').val()
+	var id = $('#id').val()
+	var arr = []
+	if(date_start==''||date_end==''){arr.push('0')}
+	else{arr.push('1')}
+	if(department=='所有部门'){arr.push('0')}
+	else{arr.push('1')}
+	if(name==''){arr.push('0')}
+	else{arr.push('1')}
+	if(id==''){arr.push('0')}
+	else{arr.push('1')}
+	var str = arr.join(',')
+	//console.log(str)
+	$.getJSON('/common/summary/check/select?str='+str+'&date_start='+date_start+'&date_end='+date_end+'&department='+department+'&name='+name+'&id='+id,function(res){
+		var htmlstr = ''
+		$.each(res,function(ind,val){
+			htmlstr += '<tr><td>'+(ind+1)+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[16]+'</td><td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]+'</td><td>'+val[22]+'</td></tr>'
+		})
+		$('#table').html(htmlstr)
+	})
+})
+</script>
+{% endblock %}

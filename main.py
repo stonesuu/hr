@@ -319,8 +319,8 @@ def com_salary_set():
 	else:
 		return 'error'
 
-@app.route('/common/salary/cal',methods=['GET','POST'])#salary_after.html中，cal按钮先post提交到这，调用存储过程，再
-def com_salary_cal():                                 #location.href = '/common/salary/cal'到这里，展示页面
+@app.route('/common/salary/cal',methods=['GET','POST'])#在salary_after页面中，cal按钮先post提交到这，调用存储过程，再
+def com_salary_cal():                                 #location.href = '/common/salary/cal'到这里，展示salary_cal页面。
 	if request.method == 'POST':
 		sql = "call hr_salary_cal()"
 		res = conn.execute(sql)
@@ -363,22 +363,38 @@ def com_salary_sub():
 		conn.cursor.execute('commit')
 		session.pop('check_upload')
 		return 'ok'
-@app.route('/common/summary/check')
+@app.route('/common/summary/check')#显示summary_check页面，显示的是考勤信息
 def com_sum_chk():
-	return 'pass'
+	return render_template('summary_check.html')
+
+@app.route('/common/summary/check/select')
+def com_sum_check_select():
+	string = request.args.get('arr')
+	date_start = request.args.get('date_start')
+	date_end = request.args.get('date_end')
+	department = request.args.get('department')
+	name = request.args.get('nam')
+	idcard = request.args.get('id')
+	arr = string.split(',')
+	return 'ok'
 
 @app.route('/common/summary/salary')
 def com_sum_sal():
 	return 'pass'
 
-@app.route('/common/summary/table',methods=['GET','POST'])#显示报表的页面
+@app.route('/common/summary/table',methods=['GET','POST'])#GET：显示summary_table页面
 def com_sum_table():
 	if request.method == 'GET':
 		if 'user' in session:
 			return render_template('summary_table.html')
 
-@app.route('/common/summary/table_get',methods=['GET','POST'])#GET:summary_table页面，getable函数请求的内容，展示简化报表
-def com_sum_tabget():
+@app.route('/common/summary/bigtable')
+def com_sum_bigtable():
+	if 'user' in session:
+		return render_template('summary_bigtable.html')#GET:显示报表的具体页面
+
+@app.route('/common/summary/table_get',methods=['GET','POST'])#GET:summary_table页面，getable函数请求的内容，在表中展示了一部分
+def com_sum_tabget():                                         #summary_bigtable页面，getable函数请求的内容，在包中展示全部内容。
 	if request.method == 'GET':
 		sql = '''select department,date_format(date,"%Y-%m-%d"),stf_num,sum_count,sum_salary,BX_XJ,YL,SY,GS,YB,
 		BI,SH_XJ,ZZS,CJS,JYS,FJS,QYSDS,ticket,protect_tool,other,output_sum,last from baobiao order by 
@@ -388,17 +404,37 @@ def com_sum_tabget():
 		return res
 	else:
 		department
-@app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,button'#submit',使用baibiao_cal存储过程计算报表内容
-def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中
-	if request.method == 'GET':
-		pass
-	else:
-		department = request.form.get('department')
-		sum_count_input = request.form.get('sum_count_input')
-		QYSDS_input = request.form.get('QYSDS_input')
-		ticket_input = request.form.get('ticket_input')
-		pro_tool_input = request.form.get('pro_tool_input')
-		other_input = request.form.get('other_input')
+# @app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,button'#submit',使用baibiao_cal存储过程计算报表内容
+# def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中
+# 	if request.method == 'GET':
+# 		pass
+# 	else:
+# 		department = request.form.get('department')
+# 		sum_count_input = request.form.get('sum_count_input')
+# 		QYSDS_input = request.form.get('QYSDS_input')
+# 		ticket_input = request.form.get('ticket_input')
+# 		pro_tool_input = request.form.get('pro_tool_input')
+# 		other_input = request.form.get('other_input')
+# 		date = '%s-01' % (get_time()[1])
+# 		sql = 'call baobiao_cal(%s,%s,%s,%s,%s,"%s","%s")' %(sum_count_input,ticket_input,pro_tool_input,other_input,QYSDS_input,department,date)
+# 		try:
+# 			print sql
+# 			conn.cursor.execute(sql)
+# 		except Exception as e:
+# 			print e
+# 			return 'error'
+# 		else:
+# 			return 'ok'
+
+@app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,按钮'#cal',使用baibiao_cal存储过程计算报表内容
+def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中。
+	if request.method == 'GET':                               #如果插入成功，则对baobiao_once执行查询，返回查询的json数据。在页面上
+		department = request.args.get('department')           #调用模态框myModal显示出来。
+		sum_count_input = request.args.get('sum_count_input')
+		QYSDS_input = request.args.get('QYSDS_input')
+		ticket_input = request.args.get('ticket_input')
+		pro_tool_input = request.args.get('pro_tool_input')
+		other_input = request.args.get('other_input')
 		date = '%s-01' % (get_time()[1])
 		sql = 'call baobiao_cal(%s,%s,%s,%s,%s,"%s","%s")' %(sum_count_input,ticket_input,pro_tool_input,other_input,QYSDS_input,department,date)
 		try:
@@ -408,7 +444,28 @@ def com_sum_tabcal():                                         #产生的数据�
 			print e
 			return 'error'
 		else:
+			sql = '''select department,date_format(date,"%Y-%m-%d"),stf_num,sum_count,sum_salary,BX_XJ,YL,SY,GS,YB,
+		BI,SH_XJ,ZZS,CJS,JYS,FJS,QYSDS,ticket,protect_tool,other,output_sum,last from baobiao_once'''
+			res = getjson(sql)
+			return res
+
+@app.route('/common/summary/submit',methods=['GET','POST'])#POST:summary_table页面，模态框myModal显示出来后，按钮sumbit，将baobiao_once的
+def com_sum_submit():                                      #内容添加进baobiao中。如果产生异常，查看异常的内容是否包含Duplicate entry
+	if request.method == 'GET':                            #如果包含，让前段提示之前已经插入过数据。
+		pass
+	else:
+		sql = 'insert into baobiao select * from baobiao_once'
+		try:
+			conn.cursor.execute(sql)
+		except Exception as e:
+			print str(e)[8:23]
+			if 'Duplicate entry' == str(e)[8:23]:
+				return 'P'
+			else:
+				return 'error'
+		else:
 			return 'ok'
+
 @app.route('/common/summary/table_sub',methods=['GET','POST'])
 def com_sum_tabsub():
 	if request.method == 'GET':

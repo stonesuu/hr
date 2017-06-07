@@ -3,8 +3,8 @@
 {% block sidebar %}
 <li><a href="/common/stuff">人员管理</a><li>
 <li><a href="/common/salary">考勤操作</a></li>
-<li><a href="#">查看考勤信息</a></li>
-<li><a href="#">查看工资表</a></li>
+<li><a href="/common/summary/check">查看考勤信息</a></li>
+<li><a href="/common/summary/salary">查看工资表</a></li>
 <li class="active"><a href="#">报表管理</a></li>
 <li><a href="/common/set">设置</a></li>
 {% endblock%}
@@ -16,7 +16,7 @@
   		<form>
 		  <div class="form-group">
 		    <label>当前日期</label>
-			<input type="datetime" id="date_now" class="form-control" disabled>
+			<input type="datetime" id="date_now" class="form-control" readonly>
 		  </div>
 		  </form>
 		</div>
@@ -24,7 +24,7 @@
   		<form>
 		  <div class="form-group">
 		    <label>计算日期</label>
-			<input type="datetime" id="date_cal" class="form-control" disabled>
+			<input type="datetime" id="date_cal" class="form-control" readonly>
 		  </div>
 		  </form>
 		</div>
@@ -93,7 +93,7 @@
 </div>
 
 <div class="row">
-<button class="btn btn-success" id="submit">产生表报</button>
+<button class="btn btn-success" id="cal">产生表报</button>
 </div>
 </div>
 
@@ -114,7 +114,76 @@
   <tbody id="table">
   </tbody>
 </table>
-<button class="btn btn-info" id="juti">显示完整表格</button>
+<button class="btn btn-info" id="bigtable">显示完整报表</button>
+
+<div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">报表内容</h4>
+      </div>
+      <div class="modal-body">
+
+            <table class="table table-striped">
+      <thead>
+      	<th>部门</th>
+      	<th>日期</th>
+      	<th>月度人数</th>
+      	<th>月度进账</th>
+      	<th>支出小计</th>
+      	<th>剩余</th>
+      </thead>
+      <tbody id="table01">
+      </tbody>
+      </table>
+
+      <table class="table table-striped">
+      <thead>
+      	<th>养老</th>
+      	<th>失业</th>
+      	<th>工伤</th>
+      	<th>医疗</th>
+      	<th>生育</th>
+      	<th>保险小计</th>
+      </thead>
+      <tbody id="table02">
+      </tbody>
+      </table>
+
+      <table class="table table-striped">
+      <thead>
+      	<th>增值税</th>
+      	<th>城建税</th>
+      	<th>教育税</th>
+      	<th>附加税</th>
+      	<th>企业所得税</th>
+      	<th>税收小计</th>
+      </thead>
+      <tbody id="table03">
+      </tbody>
+      </table>
+
+            <table class="table table-striped">
+      <thead>
+      	<th>员工工资</th>
+      	<th>乘车月票</th>
+      	<th>劳保</th>
+      	<th>其它</th>
+      </thead>
+      <tbody id="table04">
+      </tbody>
+      </table>
+
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="submit">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
@@ -158,7 +227,9 @@ function forminit(){
 	$('#other_input').val(0)
 }
 forminit()
-$('#submit').on('click',function(){
+
+//打开模态框，里面是计算的本次的报表内容
+$('#cal_back').on('click',function(){
 	var department = $('#department').val()
 	var sum_count_input = $('#sum_count_input').val()
 	var QYSDS_input = $('#QYSDS_input').val()
@@ -169,13 +240,68 @@ $('#submit').on('click',function(){
 		alert('你有一个表单没有输入')
 	$.post('/common/summary/table_cal',{'department':department,'sum_count_input':sum_count_input,'QYSDS_input':QYSDS_input,'ticket_input':ticket_input,'pro_tool_input':pro_tool_input,'other_input':other_input},function(res){
 	if(res == 'ok'){
-		alert('操作成功')
-		getable()
+		
+		
 	}
 	else{
 		alert('操作失败')
 	}
 })
 })
+
+$('#cal').on('click',function(){
+	var department = $('#department').val()
+	var sum_count_input = $('#sum_count_input').val()
+	var QYSDS_input = $('#QYSDS_input').val()
+	var ticket_input = $('#ticket_input').val()
+	var pro_tool_input = $('#pro_tool_input').val()
+	var other_input = $('#other_input').val()
+	if(sum_count_input=='' || QYSDS_input=='' || ticket_input=='' || pro_tool_input=='' || other_input=='')
+		alert('你有一个表单没有输入')
+	$.getJSON('/common/summary/table_cal?department='+department+'&sum_count_input='+sum_count_input+'&QYSDS_input='+QYSDS_input+'&ticket_input='+ticket_input+'&pro_tool_input='+pro_tool_input+'&other_input='+other_input,function(res){
+	if(res != 'error'){
+		var str01 = ''
+		var str02 = ''
+		var str03 = ''
+		var str04 = ''
+		str01 += '<tr><td>'+res[0][0]+'</td><td>'+res[0][1]+'</td><td>'+res[0][2]+'</td><td>'+res[0][3]+'</td><td>'+res[0][20]+'</td><td>'+res[0][21]+'</td></tr>'
+		str02 += '<tr><td>'+res[0][6]+'</td><td>'+res[0][7]+'</td><td>'+res[0][8]+'</td><td>'+res[0][9]+'</td><td>'+res[0][10]+'</td><td>'+res[0][5]+'</td></tr>'
+		str03 += '<tr><td>'+res[0][12]+'</td><td>'+res[0][13]+'</td><td>'+res[0][14]+'</td><td>'+res[0][15]+'</td><td>'+res[0][16]+'</td><td>'+res[0][11]+'</td></tr>'
+		str04 += '<tr><td>'+res[0][4]+'</td><td>'+res[0][17]+'</td><td>'+res[0][18]+'</td><td>'+res[0][19]+'</td></tr>'
+		$('#table01').html(str01)
+		$('#table02').html(str02)
+		$('#table03').html(str03)
+		$('#table04').html(str04)
+		$('#myModal').modal('show')
+	}
+	else{
+		alert('操作失败')
+	}
+})
+})
+//对模态框进行提交
+$('#submit').on('click',function(){
+	res = confirm('提交数据后无法更改，确认要提交吗？')
+	if(res){
+		$.post('/common/summary/submit',{'0':0},function(res){
+			if(res=='P'){
+				alert('无法提交，报表中发现相同条目，之前已经提交过了')
+				//$('#myModal').modal('hide')
+			}
+			else if(res=='error')
+				alert('出现错误')
+			else{
+				$('#myModal').modal('hide')
+				getable()
+				alert('提交成功！')
+			}
+		})
+	}
+})
+
+$('#bigtable').on('click',function(){
+	location.href = '/common/summary/bigtable'
+})
+
 </script>
 {% endblock %}
