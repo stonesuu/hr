@@ -6,7 +6,7 @@ from flask import Flask,session,request,render_template,redirect,json,url_for
 import dbutil,time
 from werkzeug import secure_filename
 try:
-	conn = dbutil.DB('hr','192.168.199.12','root','root')
+	conn = dbutil.DB('hr','10.99.160.36','root','root')
 	conn.connect()
 except Exception as e:
 	print e
@@ -210,25 +210,13 @@ def com_stuff():
 
 # @app.route('/common/stuff/add',methods=['POST'])
 # def com_stuff_add():
-# 	name = request.form.get('name')
-# 	age = int(request.form.get('age'))
-# 	sex = request.form.get('sex')
-# 	tele = int(request.form.get('tele'))
-# 	address = request.form.get('address')
-# 	company = int(request.form.get('company'))
-# 	salary = int(request.form.get('salary'))
-# 	sql = "INSERT INTO stuff(NAME,SEX,AGE,COMPANY,TEL,ADDRESS,SALARY) VALUES ('%s','%s',%s,%s,'%s','%s',%s)" %(name,sex,age,company,tele,address,salary)
-# 	res = conn.execute(sql)
-# 	if not res:
-# 		return 'ok'
-# 	else:
-# 		return 'error'
 
+#stuff页面上表格生成视图，里面还有计算出生年月和年龄的语句。
 @app.route('/common/stuff/get')
 def com_stuff_get():
 	res_for_json = [] 
 	year = datetime.datetime.now().year
-	sql = 'select name,sex,id,company,job_name,GZBZ from stuff order by order_num'
+	sql = 'select name,sex,id,department,job_name,GZBZ from stuff order by department desc,order_num'
 	res = conn.execute(sql)
 	for tmp_tuple in res:
 		tmp_id = tmp_tuple[2]
@@ -238,6 +226,88 @@ def com_stuff_get():
 		#print tmp_res_for_json
 		res_for_json.append(tmp_res_for_json)
 	return json.dumps(res_for_json)
+#显示stuff_addstuff页面，在显示页面之前查看order_num最大值，放到session['order_num']中，添加用户使用
+@app.route('/common/stuff/addstuff')
+def com_stuff_add():
+	if 'user' in session:
+		sql = 'select order_num from stuff order by order_num desc limit 1'
+		res = conn.execute(sql)
+		#print res[0][0]
+		session['order_num'] = res[0][0]
+		return render_template('stuff_addstuff.html')
+	else:
+		return redirect('/signin')
+#stuff_addstuff页面，#submit按钮，添加用户。利用session['order_num']计算新用户的order_num.
+@app.route('/common/stuff/addstuff/submit',methods=['POST'])
+def com_stuff_add_submit():
+	if 'user' in session:
+		name = request.form.get('name')
+		pre_name = request.form.get('pre_name')
+		sex = request.form.get('sex')
+		MZ = request.form.get('MZ')
+		idcard = request.form.get('id')
+		ZZMM = request.form.get('ZZMM')
+		learn = request.form.get('learn')
+		health = request.form.get('health')
+		HKLB = request.form.get('HKLB')
+		merriage = request.form.get('merriage')
+		JG = request.form.get('JG')
+		HKSZD = request.form.get('HKSZD')
+		home_phone = request.form.get('home_phone')
+		cell_phone = request.form.get('cell_phone')
+		in_work_date = request.form.get('in_work_date')
+		home_add1 = request.form.get('home_add1')
+		home_add2 = request.form.get('home_add2')
+		company = request.form.get('company')
+		job_status = request.form.get('job_status')
+		department = request.form.get('department')
+		job_name = request.form.get('job_name')
+		in_company_date = request.form.get('in_company_date')
+		LWPQGS = request.form.get('LWPQGS')
+		JT_department = request.form.get('JT_department')
+		RYXL = request.form.get('RYXL')
+		conn_name = request.form.get('conn_name')
+		conn_phone = request.form.get('conn_phone')
+		JTXZ = request.form.get('JTXZ')
+		XSBZ = request.form.get('XSBZ')
+		GZBZ = request.form.get('GZBZ')
+		base_salary = request.form.get('base_salary')
+		high_temp_base = request.form.get('high_temp_base')
+		special_job_base = request.form.get('special_job_base')
+		night_job_base = request.form.get('night_job_base')
+		leader_salary = request.form.get('leader_salary')
+		age_salary = request.form.get('age_salary')
+		meal_base = request.form.get('meal_base')
+		env_salary = request.form.get('env_salary')
+		SB_base = request.form.get('SB_base')
+		YB_base = request.form.get('YB_base')
+		switch = request.form.get('switch')
+		other = request.form.get('other')
+		sql = '''insert into stuff(name,pre_name,sex,MZ,id,ZZMM,learn,health,HKLB,merriage,JG,HKSZD,
+		home_phone,cell_phone,in_work_date,home_add1,home_add2,company,job_status,department,job_name,
+		in_company_date,LWPQGS,JT_department,RYXL,conn_name,conn_phone,JTXZ,XSBZ,GZBZ,base_salary,
+		high_temp_base,special_job_base,night_job_base,leader_salary,age_salary,meal_base,env_salary,
+		SB_base,YB_base,switch,other,order_num) values ("%s","%s","%s","%s","%s","%s","%s","%s","%s",
+		"%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s",
+		"%s","%s","%s",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"%s",%s)
+		''' %(name,pre_name,sex,MZ,idcard,ZZMM,learn,health,HKLB,merriage,JG,HKSZD,home_phone,cell_phone,\
+			in_work_date,home_add1,home_add2,company,job_status,department,job_name,in_company_date,\
+			LWPQGS,JT_department,RYXL,conn_name,conn_phone,JTXZ,XSBZ,GZBZ,base_salary,high_temp_base,\
+			special_job_base,night_job_base,leader_salary,age_salary,meal_base,env_salary,SB_base,YB_base,\
+			switch,other,session['order_num']+1)
+		try:
+			res = conn.cursor.execute(sql)
+		except Exception as e:
+			print e
+			if 'Duplicate entry' == str(e)[8:23]:
+				return 'P'
+			else:
+				return 'error'
+		else:
+			return 'ok'
+	else:
+		return redirect('/signin')
+
 
 # @app.route('/common/stuff/del',methods=['POST'])
 # def com_stuff_del():
@@ -249,16 +319,32 @@ def com_stuff_get():
 # 	else:
 # 		return 'error'
 
+@app.route('/common/stuff/select')
+def com_stuff_select():
+	if 'user' in session:
+		res_for_json = [] 
+		year = datetime.datetime.now().year
+		string = str(request.args.get('str'))
+		name = request.args.get('name')
+		idcard = request.args.get('id')
+		department = request.args.get('department')
+		arr = string.split(',')
+		sql00 = 'select name,sex,id,department,job_name,GZBZ from stuff where'
+		sql01 = 'name="%s" and ' %(name)
+		sql02 = 'id="%s" and ' %(idcard)
+		sql03 = 'department="%s" and ' %(department)
+		sql04 = sql00+sql01*int(arr[0])+aql02*int(arr[1])+sql03*int(arr[2])
+		sql = sql04[:-4]+'order by department desc,order_num'
+		res = conn.execute(sql)
+		for tmp_tuple in res:
+			tmp_id = tmp_tuple[2]
+			birth = '.'.join([tmp_id[6:10],tmp_id[10:12],tmp_id[12:14]])
+			age = str(year - int(tmp_id[6:10]))
+			tmp_res_for_json = (tmp_tuple[0],age,tmp_tuple[1],tmp_tuple[2],tmp_tuple[3],tmp_tuple[4],tmp_tuple[5])
+			#print tmp_res_for_json
+			res_for_json.append(tmp_res_for_json)
+		return json.dumps(res_for_json)
 
-
-# @app.route('/common/salary/getime')
-# def com_salary_gt():
-# 	sql = 'SELECT TIMELOK FROM company_lock WHERE ID_C=%s' %(session['group'],)
-# 	res = conn.execute(sql)
-# 	#print type(res[0][0])
-# 	date = res[0][0].strftime('%Y-%m-%d')
-# 	return date
-	
 @app.route('/common/salary',methods=['GET','POST'])
 def com_salary():
 	if request.method == 'POST':
@@ -391,7 +477,7 @@ def com_sum_check_select():
 		sql03 = 'and department="%s"' % (department)
 		sql04 = 'and name="%s"' % (name)
 		sql05 = 'and id="%s"' % (idcard)
-		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])
+		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])+'order by department desc,order_num'
 		#print sql
 		#res = getjson(sql)
 		res = conn.execute(sql)
@@ -399,10 +485,10 @@ def com_sum_check_select():
 		return json.dumps(res)
 	else:
 		return redirect('/signin')
-
-@app.route('/common/summary/check/select_session')#summary_check页面，检查session中是否存在session['check'],如果存在，就直接从session中读取。
+# summary_check页面，检查session中是否存在session['check'],如果存在，就直接从session中读取。summary_check_bigtable页面从这里取值
+@app.route('/common/summary/check/select_session')   
 def com_sum_check_selectsession():
-	if 'user' in session:
+	if 'user' in session: 
 		if 'check' in session:
 			res = session['check']
 			print len(res)
@@ -411,8 +497,10 @@ def com_sum_check_selectsession():
 			return ''
 	else:
 		return redirect('/signin')
-#查看工资表
-@app.route('/common/summary/salary')
+
+#查看工资表#查看工资表#查看工资表#查看工资表#查看工资表		
+#查看工资表#查看工资表#查看工资表#查看工资表#查看工资表
+@app.route('/common/summary/salary')#显示summary_salary页面，
 def com_sum_salary():
 	if 'user' in session:
 		return render_template('summary_salary.html')
@@ -424,7 +512,7 @@ def com_sum_salary_bigtable():
 	else:
 		return redirect('/signin')
 
-@app.route('/common/summary/salary/select')#summary_check页面，查询操作，将查询的json值存入session中，如果不是重新查询或者重新登录，能够快速使用
+@app.route('/common/summary/salary/select')#summary_salary页面，查询操作，将查询的json值存入session中，如果不是重新查询或者重新登录，能够快速使用
 def com_sum_salary_select():
 	if 'user' in session:
 		string = str(request.args.get('str'))
@@ -438,14 +526,14 @@ def com_sum_salary_select():
 		#print arr
 		sql01 = '''select id,name,department,base_salary,salary_XJ,check_salary,high_temp_salary,special_job_salary,
 		leader_salary,add_job_salary,age_salary,night_job_salary,meal_salary,env_salary,reward_salary,salary_get,
-		SB_base,YB_base,YL_C,YL_I,SY_C,SY_I,GS_C,YB_C,YB_I,BI_C,SI_C,BX_check,BX_XJ,tex,salary_sum,date from
-		check_all_stuff where
+		SB_base,YB_base,YL_C,YL_I,SY_C,SY_I,GS_C,YB_C,YB_I,BI_C,SI_C,BX_check,BX_XJ,tex,salary_sum,date_format(date,"%Y-%m") from
+		salary_all_stuff where
 		'''
 		sql02 = 'date between "%s-01" and "%s-01"' % (date_start,date_end)
 		sql03 = 'and department="%s"' % (department)
 		sql04 = 'and name="%s"' % (name)
 		sql05 = 'and id="%s"' % (idcard)
-		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])
+		sql = sql01+sql02*int(arr[0])+sql03*int(arr[1])+sql04*int(arr[2])+sql05*int(arr[3])+'order by department desc,order_num'
 		#print sql
 		#res = getjson(sql)
 		res = conn.execute(sql)
@@ -453,8 +541,21 @@ def com_sum_salary_select():
 		return json.dumps(res)
 	else:
 		return redirect('/signin')
+#summary_salary页面，检查session中是否存在session['salary'],如果存在，就直接从session中读取。
+@app.route('/common/summary/salary/select_session')
+def com_sum_salary_selectsession():
+	if 'user' in session:
+		if 'salary' in session:
+			res = session['salary']
+			print len(res)
+			return json.dumps(res)
+		else:
+			return ''
+	else:
+		return redirect('/signin')
 
-
+#报表管理#报表管理#报表管理#报表管理#报表管理
+#报表管理#报表管理#报表管理#报表管理#报表管理
 @app.route('/common/summary/table',methods=['GET','POST'])#GET：显示summary_table页面
 def com_sum_table():
 	if request.method == 'GET':
@@ -477,27 +578,6 @@ def com_sum_tabget():                                         #summary_bigtable�
 		return res
 	else:
 		pass
-# @app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,button'#submit',使用baibiao_cal存储过程计算报表内容
-# def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中
-# 	if request.method == 'GET':
-# 		pass
-# 	else:
-# 		department = request.form.get('department')
-# 		sum_count_input = request.form.get('sum_count_input')
-# 		QYSDS_input = request.form.get('QYSDS_input')
-# 		ticket_input = request.form.get('ticket_input')
-# 		pro_tool_input = request.form.get('pro_tool_input')
-# 		other_input = request.form.get('other_input')
-# 		date = '%s-01' % (get_time()[1])
-# 		sql = 'call baobiao_cal(%s,%s,%s,%s,%s,"%s","%s")' %(sum_count_input,ticket_input,pro_tool_input,other_input,QYSDS_input,department,date)
-# 		try:
-# 			print sql
-# 			conn.cursor.execute(sql)
-# 		except Exception as e:
-# 			print e
-# 			return 'error'
-# 		else:
-# 			return 'ok'
 
 @app.route('/common/summary/table_cal',methods=['GET','POST'])#POST:summary_table页面,按钮'#cal',使用baibiao_cal存储过程计算报表内容
 def com_sum_tabcal():                                         #产生的数据存在baobiao_once表中。
@@ -531,7 +611,7 @@ def com_sum_submit():                                      #内容添加进baobi
 		try:
 			conn.cursor.execute(sql)
 		except Exception as e:
-			print str(e)[8:23]
+			print e
 			if 'Duplicate entry' == str(e)[8:23]:
 				return 'P'
 			else:
@@ -559,6 +639,24 @@ def com_set_depget():
 	res = getjson(sql)
 	#print res
 	return res
+
+@app.route('/common/set/paraget')
+def com_set_paraget():
+	if 'user' in session:
+		sql = 'select name,val from para_set'
+		res = getjson(sql)
+		return res
+	else:
+		return redirect('/signin')
+
+@app.route('/common/set/jobget')
+def com_set_jobget():
+	if 'user' in session:
+		sql = 'select id,name from job'
+		res = getjson(sql)
+		return res
+	else:
+		return redirect('/signin')
 
 
 if __name__ == '__main__':

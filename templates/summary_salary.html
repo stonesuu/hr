@@ -79,7 +79,6 @@
       	<th>个税</th>
       	<th>实发合计</th>
       	<th>日期</th>
-      	<th>姓名</th>
       </thead>
       <tbody id="table">
       </tbody>
@@ -92,13 +91,13 @@
 
 {% block js %}
 <script>
-$.getJSON('/common/summary/check/get_time',function(res){
-	var str = ''
-	$.each(res,function(ind,val){
-		str += '<label><input type="checkbox" value="'+val[0]+'">'+val[0]+'</label>'
-	})
-	$('#date').html(str)
-})
+// $.getJSON('/common/summary/check/get_time',function(res){
+// 	var str = ''
+// 	$.each(res,function(ind,val){
+// 		str += '<label><input type="checkbox" value="'+val[0]+'">'+val[0]+'</label>'
+// 	})
+// 	$('#date').html(str)
+// })
 //函数与summary_table页面的函数基本相同，只有设置目标不同
 function getime(){
 	$.getJSON('/getime',function(res){
@@ -108,11 +107,11 @@ function getime(){
 }
 getime()
 //如果查询过一次，则将查询内容放到session中，切换界面的时候，或者显示具体表的时候，就先从session中读取。
-$.getJSON('/common/summary/check/select_session',function(res){
+$.getJSON('/common/summary/salary/select_session',function(res){
 	if(res !=''){
 		var htmlstr = ''
 		$.each(res,function(ind,val){
-			htmlstr += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[0]+'</td><td>'+val[2]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[16]+'</td><td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]+'</td><td>'+val[22]+'</td></tr>'
+			htmlstr += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[0]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[9]+'</td><td>'+val[11]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[28]+'</td><td>'+val[29]+'</td><td>'+val[30]+'</td><td>'+val[31]+'</td><td>'+val[1]+'</td></tr>'
 		})
 		$('#table').html(htmlstr)
 	}
@@ -166,16 +165,16 @@ $('#select').on('click',function(){
 	else{arr.push('1')}
 	var str = arr.join(',')
 	//console.log(str)
-	$.getJSON('/common/summary/check/select?str='+str+'&date_start='+date_start+'&date_end='+date_end+'&department='+department+'&name='+name+'&id='+id,function(res){
+	$.getJSON('/common/summary/salary/select?str='+str+'&date_start='+date_start+'&date_end='+date_end+'&department='+department+'&name='+name+'&id='+id,function(res){
 		var htmlstr = ''
 		$.each(res,function(ind,val){
-			htmlstr += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[0]+'</td><td>'+val[2]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[16]+'</td><td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]+'</td><td>'+val[22]+'</td></tr>'
+			htmlstr += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'+val[0]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[9]+'</td><td>'+val[11]+'</td><td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[28]+'</td><td>'+val[29]+'</td><td>'+val[30]+'</td><td>'+val[31]+'</td></tr>'
 		})
 		$('#table').html(htmlstr)
 	})
 })
 $('#bigtable').on('click',function(){
-	location.href='/common/summary/check/bigtable'
+	location.href='/common/summary/salary/bigtable'
 })
 </script>
 {% endblock %}

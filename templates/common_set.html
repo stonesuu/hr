@@ -24,19 +24,36 @@
   		</table>
 	</div>
 	<div class="col-md-4">
-  		<button class="btn btn-success">添加部门</button>
+  		<button class="btn btn-success" id="add_depart">添加部门</button>
 	</div>
 </div>
 <div class="row">
-	<h3>比例调整</h3>
+	<h3>岗位管理</h3>
 	<div class="col-md-6">
-		<table class="table table -striped">
+		<table class="table table-striped">
+  			<theader>
+  				<th>序号</th>
+  				<th>名称</th>
+  				<th>操作</th>
+  			</theader>
+  			<tbody id="job"></tbody>
+  		</table>
+	</div>
+	<div class="col-md-4">
+  		<button class="btn btn-success" id="add_job">添加岗位</button>
+	</div>
+</div>
+<div class="row">
+	<h3>参数调整</h3>
+	<div class="col-md-6">
+		<table class="table table-striped">
 			<theader>
 				<th>序号</th>
 				<th>名称</th>
+				<th>值</th>
 				<th>操作</th>
 			</theader>
-			<tbody id="set"></tbody>
+			<tbody id="para"></tbody>
 		</table>
 	</div>
 </div>
@@ -47,18 +64,46 @@
 
 {% block js %}
 <script>
-function getable(){
+var dict = {'base_salary':'基本工资','high_temp_base':'高温补助基准','special_job_base':'特岗津贴基准','night_job_base':'夜班补助基准','meal_base':'饭补基准','env_salary':'环境补助'}
+
+function getable_department(){
 	$.getJSON('/common/set/depart_get',function(res){
 		var str = ''
 		$.each(res,function(ind,val){
-			str += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td>'
-			str += '<td><button class="btn btn-success btn-xs check-btn" id="'+val[0]+'">查看</button>'
-        	str += '<button class="btn btn-info btn-xs update-btn" id="'+val[0]+'" >修改</button>'
+			str += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'
+			// str += '<button class="btn btn-success btn-xs check-btn" id="'+val[0]+'">查看</button>'
+        	// str += '<button class="btn btn-info btn-xs update-btn" id="'+val[0]+'" >修改</button>'
         	str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[0]+'">删除</button></td></tr>'
 		})
 		$('#department').html(str)
 	})
 }
-getable()
+getable_department()
+
+function getable_para(){
+	$.getJSON('/common/set/paraget',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<tr><td>'+(ind+1)+'</td><td>'+dict[val[0]]+'</td><td>'+val[1]+'</td><td>'
+			str += '<button class="btn btn-info btn-xs change-btn" name="'+val[0]+'">修改</button></td></tr>'
+		})
+		$('#para').html(str)
+	})
+}
+getable_para()
+
+function getable_job(){
+	$.getJSON('/common/set/jobget',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<tr><td>'+(ind+1)+'</td><td>'+val[1]+'</td><td>'
+			// str += '<button class="btn btn-success btn-xs check-btn" id="'+val[0]+'">查看</button>'
+        	// str += '<button class="btn btn-info btn-xs update-btn" id="'+val[0]+'" >修改</button>'
+        	str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[0]+'">删除</button></td></tr>'
+		})
+		$('#job').html(str)
+	})
+}
+getable_job()
 </script>
 {% endblock %}

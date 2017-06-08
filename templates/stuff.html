@@ -3,8 +3,8 @@
 {% block sidebar %}
 <li class="active"><a href="#">人员管理</a><li>
 <li><a href="/common/salary">考勤操作</a></li>
-<li><a href="#">查看考勤信息</a></li>
-<li><a href="#">查看工资表</a></li>
+<li><a href="/common/summary/check">查看考勤信息</a></li>
+<li><a href="/common/summary/salary">查看工资表</a></li>
 <li><a href="/common/summary/table">报表管理</a></li>
 <li><a href="/common/set">设置</a>
 {% endblock%}
@@ -12,97 +12,47 @@
 {% block content %}
 <!-- <h3 class="sub-header">人员添加</h3> -->
 <div class="container-fluid">
+
+  </div>
   <div class="row">
-  <div class="col-md-4">
-    <form class="form-horizontal">
+  <button class="btn btn-success" id="add">添加人员</button>
+  </div>
+
+
+<div class="row">
+      <div class="col-md-3">
+      <form>
       <div class="form-group">
-        <label class="col-md-2 control-label">姓名</label>
-        <div class="col-md-10">
-          <input type="text" id="name" class="form-control">
-        </div>
-  </div>
-</form>
-</div>
-<div class="col-md-1">
-  <h5 id="name_msg"></h5>
-</div>
+        <label>姓名</label>
+        <input type="text" id="name" class="form-control">
+      </div>
+      </form>
+    </div>
 
-  <div class="col-md-4">
-  <form class="form-horizontal">
-  <div class="form-group">
-    <label class="col-md-2 control-label">年龄</label>
-    <div class="col-md-10">
-    <input type="text" id="age" class="form-control">
-  </div>
-  </div>
-</form>
-</div>
-<div class="col-md-1">
-  <h5 id="age_msg"></h5>
-</div>
+        <div class="col-md-3">
+      <form>
+      <div class="form-group">
+        <label>身份证号</label>
+        <input type="text" id="id" class="form-control">
+      </div>
+      </form>
+    </div>
 
-<div class="col-md-2">
-  <div class="form-group">
-    <label class=" col-md-4 control-label">性别</label>
-    <div class="col-md-8">
-    <select class="form-control" id="sex">
-      <option>男</option>
-      <option>女</option>
-    </select>
-  </div>
-  </div>
-</div>
-</div>
 
-<div class="row">
-  <div class="col-md-4">
-  <form class="form-horizontal">
-  <div class="form-group">
-    <label class="col-md-2 control-label">电话</label>
-    <div class="col-sm-10">
-    <input type="text" id="tele" class="form-control">
-  </div>
-  </div>
-</form>
-</div>
-<div class="col-md-1">
-  <h5 id="tele_msg"></h5>
-</div>
+     <div class="col-md-3">
+      <form>
+      <div class="form-group">
+        <label>部门</label>
+        <select class="form-control" id="department">
+        </select>
+      </div>
+      </form>
+    </div>
 
-  <div class="col-md-4">
-  <form class="form-horizontal">
-  <div class="form-group">
-    <label class="col-md-2 control-label">住址</label>
-    <div class="col-md-10">
-    <input type="text" id="address" class="form-control">
-  </div>
-  </div>
-</form>
-</div>
-<div class="col-md-1">
-  <h5 id="address_msg"></h5>
-</div>
-</div>
+       <div class="col-md-3">
+    <button class="btn btn-success" id="select">查询</button>
+    </div>
 
-<div class="row">
-   <div class="col-md-4">
-  <form class="form-horizontal">
-  <div class="form-group">
-    <label class="col-md-2 control-label">工资</label>
-    <div class="col-sm-10">
-    <input type="text" id="salary" class="form-control">
-  </div>
-  </div>
-</form>
-</div>
-<div class="col-md-1">
-  <h5 id="salary_msg"></h5>
-</div>
-  <div class="col-md-1 col-sm-offset-2">
-  <button type="button" id="submit" class="btn btn-sm btn-primary">添加人员</button>
-</div>
-</div>
-</div>
 
 <table class="table table-striped">
   <thead>
@@ -112,7 +62,7 @@
       <th>年龄</th>
       <th>性别</th>
       <th>身份证</th>
-      <th>公司</th>
+      <th>部门</th>
       <th>工作内容</th>
       <th>工作班制</th>
       <th>操作</th>
@@ -122,50 +72,6 @@
   </tbody>
 </table>
 
-  <div class="modal fade" tabindex="-1" role="dialog" id="mymodal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">查询</h4>
-      </div>
-      <div class="modal-body">
-	<form class="form-inline">
-	  <div class="form-group">
-	    <label for="name">姓名</label>
-	    <input type="text" class="form-control" id="modal_name" placeholder="">
-	  </div>
-	  <div class="form-group">
-	    <label for="age">年龄</label>
-	    <input type="text" class="form-control" id="modal_age" placeholder="">
-	  </div>
-	    <div class="form-group">
-	    <label for="sex">性别</label>
-	    <select type="text" class="form-control" id="modal_sex">
-	    	<option>男</option>
-	    	<option>女</option>
-	    </select>
-	  </div>
-        <div class="form-group">
-      <label for="age">电话</label>
-      <input type="text" class="form-control" id="modal_tele" placeholder="">
-    </div>
-        <div class="form-group">
-      <label for="age">住址</label>
-      <input type="text" class="form-control" id="modal_address" placeholder="">
-    </div>
-            <div class="form-group">
-      <label for="age">工资</label>
-      <input type="text" class="form-control" id="modal_salary" placeholder="">
-    </div>
-	</form>
-	      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary" id="modal_confirm" pk="">确认</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
 </div>
 
 <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="check_stuff">
@@ -235,71 +141,44 @@ $(document).on('click','.check-btn',function(res){
   $('#check_stuff').modal('show')
 })
 
-//   $('#submit').on('click',function(){
-//     var token = 1
-//     var name = $('#name').val()
-//     var age = $('#age').val()
-//     var sex = $('#sex').val()
-//     var tele = $('#tele').val()
-//     var address = $('#address').val()
-//     var company = $('#navbar').attr('group')
-//     var salary = $('#salary').val()
-//     if(name.length==0){
-//       $('#name_msg').html('内容错误')
-//       token = 0
-//     }
-//         if(age.length==0){
-//       $('#age_msg').html('内容错误')
-//       token = 0
-//     }
-//         if(tele.length==0){
-//       $('#tele_msg').html('内容错误')
-//       token = 0
-//     }
-//         if(address.length==0){
-//       $('#address_msg').html('内容错误')
-//       token = 0
-//     }
-//      if(salary.length==0){
-//       $('#salary_msg').html('内容错误')
-//       token = 0
-//     }
+$('#add').on('click',function(){
+  location.href='/common/stuff/addstuff'
+})
+function getdepart(){
+  $.getJSON('/common/set/depart_get',function(res){
+    var str = '<option>所有部门</option>'
+    $.each(res,function(ind,val){
+      str += '<option>'+val[1]+'</option>'
+    })
+    //console.log(str)
+    $('#department').html(str)
+  })
+}
+getdepart()
+$('#select').on('click',function(){
+  var name = $('#name').val()
+  var id = $('#id').val()
+  var department = $('#department').val()
+  var arr = []
+  if(name==''){arr.push('0')}
+  else{arr.push('1')}
+  if(id==''){arr.push('0')}
+  else{arr.push('1')}
+  if(department=='所有部门'){arr.push('0')}
+  else{arr.push('1')}
+  var str = arr.join(',')
+  $.getJSON('/common/stuff/select?str='+str+'&name='+name+'&id='+id+'&department='+department,function(res){
+    var htmlstr = ''
+    $.each(res,function(ind,val){
+    str += '<tr><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[6]+'</td>'
+    str += '<td><button class="btn btn-success btn-xs check-btn" id="'+val[2]+'">查看</button>'
+    str += '<button class="btn btn-info btn-xs update-btn" id="'+val[2]+'" >修改</button>'
+    str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[2]+'">删除</button></td></tr>'
+    })
+    $('#table').html(str)
+  })
+})
 
-//     if(token == 1){
-//       $.post('/common/stuff/add',{'name':name,'age':age,'sex':sex,'tele':tele,'address':address,'company':company,'salary':parseInt(salary)*100},function(res){
-//         if(res == 'ok'){
-//           $('#name').val('')
-//           $('#age').val('')
-//           $('#tele').val('')
-//           $('#address').val('')
-//           $('#salary').val('')
-//           getable()
-//           alert('操作成功')
-//       }
-//         else{
-//           alert('操作失败')
-//       }
-//     })
-//   }
-//   else{}
-//   })
-
-//   $(document).on('click','.delete-btn',function(){
-//   	res = confirm('确认删除？')
-//   	if(res){
-//   		var id = $(this).attr('id')
-//   		$.post('/common/stuff/del',{'id':id},function(res){
-//         console.log(res)
-//   			if(res == 'ok'){
-//           getable()
-//   				alert('操作成功')
-//   			}
-//   			else{
-//   				alert('操作失败')
-//   			}
-//   		})
-//   }
-//   })
 
 //   $(document).on('click','.update-btn',function(){
 //   	var id = $(this).attr('id')
@@ -319,28 +198,5 @@ $(document).on('click','.check-btn',function(res){
 //     $('#mymodal').modal('show')
 //   })
 
-// $('#modal_confirm').on('click',function(){
-//   var id = $(this).attr('pk')
-//   var name = $('#modal_name').val()
-//   var sex = $('#modal_sex').val()
-//   var age = $('#modal_age').val()
-//   var tele = $('#modal_tele').val()
-//   var address = $('#modal_address').val()
-//   var salary = $('#modal_salary').val()
-//   res = confirm('确认修改?')
-//   if(res){
-
-//     $.post('/common/stuff/update',{'id':id,'name':name,'sex':sex,'age':age,'tele':tele,'address':address,'salary':parseInt(salary)*100},function(res){
-//       if(res == 'ok'){
-//         getable()
-//         $('#mymodal').modal('hide')
-//         alert('操作成功')
-//       }
-//       else{
-//         alert('操作失败')
-//       }
-//   })
-// }
-// })
 </script>
 {% endblock %}

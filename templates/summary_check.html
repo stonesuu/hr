@@ -10,7 +10,7 @@
 {% endblock%}
 
 {% block content %}
-<div class=".container-fluid">
+<div class="container-fluid">
 	<div class="row">
 		<div class="col-md-3">
   		<form>
@@ -89,13 +89,13 @@
 
 {% block js %}
 <script>
-$.getJSON('/common/summary/check/get_time',function(res){
-	var str = ''
-	$.each(res,function(ind,val){
-		str += '<label><input type="checkbox" value="'+val[0]+'">'+val[0]+'</label>'
-	})
-	$('#date').html(str)
-})
+// $.getJSON('/common/summary/check/get_time',function(res){
+// 	var str = ''
+// 	$.each(res,function(ind,val){
+// 		str += '<label><input type="checkbox" value="'+val[0]+'">'+val[0]+'</label>'
+// 	})
+// 	$('#date').html(str)
+// })
 //函数与summary_table页面的函数基本相同，只有设置目标不同
 function getime(){
 	$.getJSON('/getime',function(res){
@@ -171,6 +171,7 @@ $('#select').on('click',function(){
 		$('#table').html(htmlstr)
 	})
 })
+//展示大表
 $('#bigtable').on('click',function(){
 	location.href='/common/summary/check/bigtable'
 })

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>hr</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+</head>
+<button class="btn btn-info" id="return">返回</button>
+<body>
+	<table class="table table-bordered table_striped table-hover">
+		<thead>
+		<tr>
+			<th>编号</th>
+			<th class='success'>姓名</th>
+			<th class="active">身份证号</th>
+			<th class="success">部门</th>
+			<th>基本工资</th>
+			<th>工资小计</th>
+			<th>工资订正</th>
+			<th>高温补助</th>
+			<th>特岗津贴</th>
+			<th>班组长津贴</th>
+			<th>加班费</th>
+			<th>年工工资</th>
+			<th>夜班费</th>
+			<th>饭补</th>
+			<th>环境补助</th>
+			<th>协力工津贴</th>
+			<th>应发工资</th>
+			<th>社保基数</th>
+			<th>医保基数</th>
+			<th>养老/公司</th>
+			<th>养老/个人</th>
+			<th>失业/公司</th>
+			<th>失业/个人</th>
+			<th>工伤/公司</th>
+			<th>医疗/公司</th>
+			<th>医疗/个人</th>
+			<th>生育/公司</th>
+			<th>重疾/公司</th>
+			<th>保险订正</th>
+			<th>保险小计</th>
+			<th>个人所得税</th>
+			<th>实发工资</th>
+			<th class='success'>日期</th>
+			<th class="active">姓名</th>
+		</tr>
+		</thead>
+		<tbody id="table"></tbody>
+	</table>
+  	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+	<script>
+	function getable(){
+		$.getJSON('/common/summary/salary/select_session',function(res){
+			str = ""
+			$.each(res,function(ind,val){
+				str += '<tr><td>'+(ind+1)+'</td><td class="success">'+val[1]+'</td><td class="active">'+val[0]+'</td>'
+				str += '<td class="success">'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[4]+'</td>'
+				str += '<td>'+val[5]+'</td><td>'+val[6]+'</td><td>'+val[7]+'</td>'
+				str += '<td>'+val[8]+'</td><td>'+val[9]+'</td><td>'+val[10]+'</td>'
+				str += '<td>'+val[11]+'</td><td>'+val[12]+'</td><td>'+val[13]+'</td>'
+				str += '<td>'+val[14]+'</td><td>'+val[15]+'</td><td>'+val[16]+'</td>'
+				str += '<td>'+val[17]+'</td><td>'+val[18]+'</td><td>'+val[19]+'</td>'
+				str += '<td>'+val[20]+'</td><td>'+val[21]+'</td><td>'+val[22]+'</td>'
+				str += '<td>'+val[23]+'</td><td>'+val[24]+'</td><td>'+val[25]+'</td>'
+				str += '<td>'+val[26]+'</td><td>'+val[27]+'</td><td>'+val[28]+'</td>'
+				str += '<td>'+val[29]+'</td><td>'+val[30]+'</td><td class="success">'+val[31]+'</td>'
+				str += '<td class="active">'+val[1]+'</td></tr>'
+
+			})
+			$('#table').html(str)
+		})
+	}
+	getable()
+	$('#return').on('click',function(){
+		location.href='/common/summary/salary'
+	})
+	</script>
+</body>
+</html>
