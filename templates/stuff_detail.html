@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li class="active"><a href="#">人员管理</a><li>
+<li><a href="/common/salary">考勤操作</a></li>
+<li><a href="/common/summary/check">查看考勤信息</a></li>
+<li><a href="/common/summary/salary">查看工资表</a></li>
+<li><a href="/common/summary/table">报表管理</a></li>
+<li><a href="/common/set">设置</a>
+{% endblock%}
+
+{% block content %}
+<h3>人员具体信息:</h3>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-4" id="msg01">
+		</div>
+		<div class="col-md-3 col-md-offset-2" id="img">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-10">
+			<hr style=" height:2px;border:none;border-top:2px solid #185598;" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4" id="msg02">
+		</div>
+		<div class="col-md-5" id="msg03">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-10">
+			<hr style=" height:2px;border:none;border-top:2px solid #185598;" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4" id="msg04">
+		</div>
+		<div class="col-md-4" id="msg05">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-10">
+			<hr style=" height:2px;border:none;border-top:2px solid #185598;" />
+		</div>
+	</div>
+</div>
+<button class="btn btn-info" id="return">返回</button>
+{% endblock %}
+
+{% block js %}
+<script>
+$.getJSON('/common/stuff/detail/msg01',function(res){
+	var tuple = res[3][0]
+	var str01 = '<li>姓名：'+res[3][0][0]+'</li><li>出生日期：'+res[0]+'</li><li>年龄：'+res[1]+'</li>'
+	str01 += '<li>性别：'+res[3][0][2]+'</li><li>名族：'+res[3][0][3]+'</li><li>曾用名：'+res[3][0][1]+'</li><li>身份证号：'+res[3][0][4]+'</li>'
+	img = '<img src="/static/img/'+res[2]+'.jpg" alt="未找到图片" style="height:200px;width:150px;" />'
+	var str02 = '<li>政治面貌：'+tuple[5]+'</li><li>学历：'+tuple[6]+'</li><li>健康状况：'+tuple[7]+'</li><li>户口类别：'+tuple[8]+'</li><li>婚否：'+tuple[9]+'</li><li>籍贯：'+tuple[10]+'</li><li>户口所在地：'+tuple[11]+'</li><li>家庭电话：'+tuple[12]+'</li><li>个人电话：'+tuple[13]+'</li><li>联系人姓名：'+tuple[25]+'</li><li>联系人电话：'+tuple[26]+'</li>'
+	var str03 = '<li>家庭住址1：'+tuple[15]+'</li><li>家庭住址2：'+tuple[16]+'</li>'
+	var str04 = '<li>参加工作时间：'+tuple[14]+'</li><li>公司：'+tuple[17]+'</li><li>工作状态：'+tuple[18]+'</li><li>部门：'+tuple[19]+'</li><li>工种：'+tuple[20]+'</li><li>进入公司时间：'+tuple[21]+'</li><li>劳务派遣公司：'+tuple[22]+'</li><li>集团部门：'+tuple[23]+'</li><li>人员序列：'+tuple[24]+'</li><li>津贴性质：'+tuple[27]+'</li><li>享受标准：'+tuple[28]+'</li><li>工作班制：'+tuple[29]+'</li>'
+	var str05 = '<li>基本工资：'+tuple[30]+'</li><li>高温补助基准：'+tuple[31]+'</li><li>特岗津贴基准：'+tuple[32]+'</li><li>夜班费基准：'+tuple[33]+'</li><li>班组长津贴：'+tuple[34]+'</li><li>年工工资：'+tuple[35]+'</li><li>饭补基准：'+tuple[36]+'</li><li>环境补助：'+tuple[37]+'</li><li>社保基准'+tuple[38]+'</li><li>医保基准：'+tuple[29]+'</li><li>其它'+tuple[41]+'</li>'
+
+	$('#msg01').html(str01)
+	$('#img').html(img)
+	$('#msg02').html(str02)
+	$('#msg03').html(str03)
+	$('#msg04').html(str04)
+	$('#msg05').html(str05)
+})
+
+$('#return').on('click',function(){
+	location.href="/common/stuff"
+})
+</script>
+{% endblock %}

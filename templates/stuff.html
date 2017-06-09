@@ -74,7 +74,7 @@
 
 </div>
 
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="check_stuff">
+<!-- <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="check_stuff">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
         <div class="modal-header">
@@ -104,7 +104,7 @@
         </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <!--   <div class="form-group">
       <button type="submit" class="btn btn-default">添加</button>
@@ -123,23 +123,23 @@
 	// 	$('#navbar').attr('group',res[1])
 	// })
 
-  function getable(){
+  function getable(){//这是刷新表的函数，下面还有一个查询后显示的函数，两个不要忘记一起改
     var str = ''
     $.getJSON('/common/stuff/get',function(res){
       $.each(res,function(ind,val){
         str += '<tr><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[6]+'</td>'
-        str += '<td><button class="btn btn-success btn-xs check-btn" id="'+val[2]+'">查看</button>'
-        str += '<button class="btn btn-info btn-xs update-btn" id="'+val[2]+'" >修改</button>'
-        str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[2]+'">删除</button></td></tr>'
+        str += '<td><button class="btn btn-success btn-xs detail-btn" id="'+val[3]+'">查看</button>'
+        str += '<button class="btn btn-info btn-xs update-btn" id="'+val[3]+'" >修改</button>'
+        str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[3]+'">删除</button></td></tr>'
       })
       $('#table').html(str)
     })
   }
   getable()
 
-$(document).on('click','.check-btn',function(res){
-  $('#check_stuff').modal('show')
-})
+// $(document).on('click','.check-btn',function(res){
+//   $('#check_stuff').modal('show')
+// })
 
 $('#add').on('click',function(){
   location.href='/common/stuff/addstuff'
@@ -155,7 +155,7 @@ function getdepart(){
   })
 }
 getdepart()
-$('#select').on('click',function(){
+$('#select').on('click',function(){//查询操作，查询完成之后还要显示出来，显示部分和getable()相同，如果改动不要忘记一起改
   var name = $('#name').val()
   var id = $('#id').val()
   var department = $('#department').val()
@@ -168,35 +168,45 @@ $('#select').on('click',function(){
   else{arr.push('1')}
   var str = arr.join(',')
   $.getJSON('/common/stuff/select?str='+str+'&name='+name+'&id='+id+'&department='+department,function(res){
+    if(res=='0'){$('#table').html('')}//后端如果没有查询到内容，后端返回0，前端发现后不进行处理。
+    else{
     var htmlstr = ''
     $.each(res,function(ind,val){
     str += '<tr><td>'+(ind+1)+'</td><td>'+val[0]+'</td><td>'+val[1]+'</td><td>'+val[2]+'</td><td>'+val[3]+'</td><td>'+val[4]+'</td><td>'+val[5]+'</td><td>'+val[6]+'</td>'
-    str += '<td><button class="btn btn-success btn-xs check-btn" id="'+val[2]+'">查看</button>'
-    str += '<button class="btn btn-info btn-xs update-btn" id="'+val[2]+'" >修改</button>'
-    str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[2]+'">删除</button></td></tr>'
+    str += '<td><button class="btn btn-success btn-xs detail-btn" id="'+val[3]+'">查看</button>'
+    str += '<button class="btn btn-info btn-xs update-btn" id="'+val[3]+'" >修改</button>'
+    str += '<button class="btn btn-danger btn-xs delete-btn" id="'+val[3]+'">删除</button></td></tr>'
     })
     $('#table').html(str)
+  }
+  })
+})
+$(document).on('click','.delete-btn',function(){
+  id=$(this).attr('id')
+  $.post('/common/stuff/del',{'id':id},function(res){
+    if(res=='ok'){
+      alert('删除成功')
+      getable()
+    }
+    else{alert('删除失败')}
+  })
+})
+$(document).on('click','.update-btn',function(){
+  id=$(this).attr('id')
+  $.post('/common/stuff/update/before',{'id':id},function(res){
+    if(res=='ok')
+    {location.href='/common/stuff/update/on'}
+    else{alert('修改操作失败')}
   })
 })
 
-
-//   $(document).on('click','.update-btn',function(){
-//   	var id = $(this).attr('id')
-//   	var name = $(this).attr('name')
-//   	var sex = $(this).attr('sex')
-//   	var age = $(this).attr('age')
-//   	var tele = $(this).attr('tele')
-//   	var address = $(this).attr('address')
-//     var salary = $(this).attr('salary')
-//     $('#modal_name').val(name)
-//     $('#modal_age').val(age)
-//     $('#modal_sex').val(sex)
-//     $('#modal_tele').val(tele)
-//     $('#modal_address').val(address)
-//     $('#modal_salary').val(salary)
-//     $('#modal_confirm').attr('pk',id)
-//     $('#mymodal').modal('show')
-//   })
-
+$(document).on('click','.detail-btn',function(){
+  id=$(this).attr('id')
+  $.post('/common/stuff/detail/before',{'id':id},function(res){
+    if(res=='ok')
+    {location.href='/common/stuff/detail/on'}
+    else{alert('修改操作失败')}
+  })
+})
 </script>
 {% endblock %}

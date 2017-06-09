@@ -16,7 +16,7 @@ else:
 SN_dict = {}
 date_list = []
 UPLOAD_FOLDER = 'D:\upload'
-ALLOWED_EXTENSIONS = set(['xls','xlsx'])
+ALLOWED_EXTENSIONS = set(['xls','xlsx','jpg'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -129,7 +129,7 @@ def upload():
             #return redirect(url_for('uploaded_file',filename=filename))
         	res = excel_to_db_stuff(ab_path_file)
         	return res
-
+        	
 @app.route('/getime')#供所有页面获取时间，调用get_time函数
 def getime():
 	res = get_time()
@@ -309,16 +309,16 @@ def com_stuff_add_submit():
 		return redirect('/signin')
 
 
-# @app.route('/common/stuff/del',methods=['POST'])
-# def com_stuff_del():
-# 	ID_I = request.form.get('id')
-# 	sql = "DELETE FROM stuff WHERE ID_I=%s" % (ID_I)
-# 	res = conn.execute(sql)
-# 	if not res:
-# 		return 'ok'
-# 	else:
-# 		return 'error'
-
+@app.route('/common/stuff/del',methods=['POST'])
+def com_stuff_del():
+	ID_I = request.form.get('id')
+	sql = 'DELETE FROM stuff WHERE id="%s"' % (ID_I)
+	res = conn.execute(sql)
+	if not res:
+		return 'ok'
+	else:
+		return 'error'
+#stuff页面查询操作。查询完毕之后的操作与/common/stuff/get操作相同，存在计算出生日期和年龄的操作。但是多了一个查询结果为空值的处理。
 @app.route('/common/stuff/select')
 def com_stuff_select():
 	if 'user' in session:
@@ -329,21 +329,109 @@ def com_stuff_select():
 		idcard = request.args.get('id')
 		department = request.args.get('department')
 		arr = string.split(',')
-		sql00 = 'select name,sex,id,department,job_name,GZBZ from stuff where'
+		sql00 = 'select name,sex,id,department,job_name,GZBZ from stuff where '
 		sql01 = 'name="%s" and ' %(name)
 		sql02 = 'id="%s" and ' %(idcard)
 		sql03 = 'department="%s" and ' %(department)
-		sql04 = sql00+sql01*int(arr[0])+aql02*int(arr[1])+sql03*int(arr[2])
-		sql = sql04[:-4]+'order by department desc,order_num'
+		sql04 = sql00+sql01*int(arr[0])+sql02*int(arr[1])+sql03*int(arr[2])
+		if 'and ' in sql04:
+			sql = sql04[:-4]+'order by department desc,order_num' #如果三个查询条件均为空，需要把where去掉，如果不为空，把and去掉。
+		else:
+			sql = sql04[:-6]+'order by department desc,order_num'
+		#print sql
 		res = conn.execute(sql)
-		for tmp_tuple in res:
-			tmp_id = tmp_tuple[2]
+		print len(res)
+		if len(res) != 0:
+			for tmp_tuple in res:
+				tmp_id = tmp_tuple[2]
+				birth = '.'.join([tmp_id[6:10],tmp_id[10:12],tmp_id[12:14]])
+				age = str(year - int(tmp_id[6:10]))
+				tmp_res_for_json = (tmp_tuple[0],age,tmp_tuple[1],tmp_tuple[2],tmp_tuple[3],tmp_tuple[4],tmp_tuple[5])
+				#print tmp_res_for_json
+				res_for_json.append(tmp_res_for_json)
+		else:
+			res_for_json = '0'
+		return json.dumps(res_for_json)
+
+#POST：stuff页面，.update-btn按钮，提交id，存入session['updateid']值，然后返回ok
+#GET：sutff_update页面请求的用户的全部信息。
+@app.route('/common/stuff/update/before',methods=['GET','POST'])
+def com_stuff_update_before():
+	if 'user' in session:
+		if request.method=='POST':
+			idcard = request.form.get('id')
+			session['updateid'] = idcard
+			return 'ok'
+		else:
+			sql = '''select name,pre_name,sex,MZ,id,ZZMM,learn,health,HKLB,merriage,JG,HKSZD,
+		home_phone,cell_phone,date_format(in_work_date,"%Y-%m-%d"),home_add1,home_add2,company,job_status,department,job_name,
+		date_format(in_company_date,"%Y-%m-%d")'''+''',LWPQGS,JT_department,RYXL,conn_name,conn_phone,JTXZ,XSBZ,GZBZ,base_salary,
+		high_temp_base,special_job_base,night_job_base,leader_salary,age_salary,meal_base,env_salary,
+		SB_base,YB_base,switch,other from stuff where id="%s"''' % (session['updateid'])
+			res = getjson(sql)
+			return res
+	else:
+		return redirect('/signin')
+
+#显示stuff_update页面
+@app.route('/common/stuff/update/on',methods=['GET','POST'])
+def com_stuff_update_on():
+	if 'user' in session:
+		if request.method == 'GET':
+			return render_template('stuff_update.html')
+		else:
+			val = request.form.get('01')
+			arr = str(val).split(':')
+			if arr[0] in ['base_salary',
+		'high_temp_base','special_job_base','night_job_base','leader_salary','age_salary','meal_base','env_salary',
+		'SB_base','YB_base','switch']:
+				sql = 'update stuff set %s=%s where id="%s"' %(arr[0],arr[1],session['updateid'])
+			else:
+				sql = 'update stuff set %s="%s" where id="%s"' %(arr[0],arr[1],session['updateid'])
+			res = conn.execute(sql)
+			if not res:
+				return 'ok'
+			else:
+				return 'error'
+	else:
+		return redirect('/signin')
+#stuff页面，.detail-ben按钮，提交id，存入session['detailid'],返回ok
+@app.route('/common/stuff/detail/before',methods=['POST'])
+def com_stuff_detail_before():
+	if 'user' in session:
+		idcard = request.form.get('id')
+		session['detailid'] = idcard
+		return 'ok'
+	else:
+		return redirect('/signin')
+
+#显示stuff_detail页面
+@app.route('/common/stuff/detail/on')
+def com_stuff_detail_on():
+	if 'user' in session:
+		return render_template('stuff_detail.html')
+	else:
+		return redirect('/signin')
+
+@app.route('/common/stuff/detail/msg01')
+def com_stuff_detail_msg01():
+	if 'user' in session:
+		sql = '''select name,pre_name,sex,MZ,id,ZZMM,learn,health,HKLB,merriage,JG,HKSZD,
+		home_phone,cell_phone,date_format(in_work_date,"%Y-%m-%d"),home_add1,home_add2,company,job_status,department,job_name,
+		date_format(in_company_date,"%Y-%m-%d")'''+''',LWPQGS,JT_department,RYXL,conn_name,conn_phone,JTXZ,XSBZ,GZBZ,base_salary,
+		high_temp_base,special_job_base,night_job_base,leader_salary,age_salary,meal_base,env_salary,
+		SB_base,YB_base,switch,other from stuff where id="%s"''' % (session['detailid'])
+		res = conn.execute(sql)
+		if len(res) != 0:
+			year = datetime.datetime.now().year
+			tmp_id = session['detailid']
 			birth = '.'.join([tmp_id[6:10],tmp_id[10:12],tmp_id[12:14]])
 			age = str(year - int(tmp_id[6:10]))
-			tmp_res_for_json = (tmp_tuple[0],age,tmp_tuple[1],tmp_tuple[2],tmp_tuple[3],tmp_tuple[4],tmp_tuple[5])
-			#print tmp_res_for_json
-			res_for_json.append(tmp_res_for_json)
-		return json.dumps(res_for_json)
+			return json.dumps((birth,age,session['detailid'],res))
+			#session.pop('detailid')
+		else:
+			return '0'
+
 
 @app.route('/common/salary',methods=['GET','POST'])
 def com_salary():
@@ -486,11 +574,12 @@ def com_sum_check_select():
 	else:
 		return redirect('/signin')
 # summary_check页面，检查session中是否存在session['check'],如果存在，就直接从session中读取。summary_check_bigtable页面从这里取值
-@app.route('/common/summary/check/select_session')   
+@app.route('/common/summary/check/select_session')   #注意这里有session.pop操作
 def com_sum_check_selectsession():
 	if 'user' in session: 
 		if 'check' in session:
 			res = session['check']
+			#session.pop('check')
 			print len(res)
 			return json.dumps(res)
 		else:
@@ -542,12 +631,13 @@ def com_sum_salary_select():
 	else:
 		return redirect('/signin')
 #summary_salary页面，检查session中是否存在session['salary'],如果存在，就直接从session中读取。
-@app.route('/common/summary/salary/select_session')
+@app.route('/common/summary/salary/select_session') #注意这里有session.pop操作
 def com_sum_salary_selectsession():
 	if 'user' in session:
 		if 'salary' in session:
 			res = session['salary']
-			print len(res)
+			#session.pop('salary')
+			#print res
 			return json.dumps(res)
 		else:
 			return ''

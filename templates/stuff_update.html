@@ -1,0 +1,445 @@
+{% extends 'layout.html' %}
+
+{% block sidebar %}
+<li class="active"><a href="#">人员管理</a><li>
+<li><a href="/common/salary">考勤操作</a></li>
+<li><a href="/common/summary/check">查看考勤信息</a></li>
+<li><a href="/common/summary/salary">查看工资表</a></li>
+<li><a href="/common/summary/table">报表管理</a></li>
+<li><a href="/common/set">设置</a>
+{% endblock%}
+
+{% block content %}
+<div class="container-fluid">
+<h3>人员信息修改：</h3>
+	<div class="row">
+
+		<div class="col-md-5 col-md-offset-1">
+				<form class="form-horizontal">
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">姓名：</label>
+    				<div class="col-sm-8">
+      				<input type="text" id="name" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">身份证号：</label>
+    				<div class="col-sm-8">
+      				<input type="text" id="id" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">曾用名：</label>
+    				<div class="col-sm-8">
+      				<input type="text" id="pre_name" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">性别：</label>
+    				<div class="col-sm-8">
+      				<select class="form-control" id="sex">
+        			<option>男</option>
+        			<option>女</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">名族：</label>
+    				<div class="col-sm-8">
+      				<select id="MZ" class="form-control">
+        			<option>汉族</option>
+        			<option>其它</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">政治面貌：</label>
+    				<div class="col-sm-8">
+      				<select id="ZZMM" class="form-control">
+        			<option>群众</option>
+        			<option>党员</option>
+        			<option>团员</option>
+        			</select>
+    				</div>
+  					</div>
+					<div class="form-group">
+    				<label class="col-sm-4 control-label">学历：</label>
+    				<div class="col-sm-8">
+      				<select id="learn" class="form-control">
+      				<option>技校</option>
+        			<option>大专</option>
+        			<option>中专及以下</option>
+        			<option>硕士及以上</option>
+        			<option>本科</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">健康状况：</label>
+    				<div class="col-sm-8">
+      				<select id="health" class="form-control">
+        			<option>健康</option>
+        			<option>慢性病</option>
+        			<option>残疾</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">户口类别：</label>
+    				<div class="col-sm-8">
+      				<select id="HKLB" class="form-control">
+        			<option>农村</option>
+        			<option>城市</option>
+        			<option>唐山城镇</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">婚姻状况：</label>
+    				<div class="col-sm-8">
+      				<select id="merriage" class="form-control">
+        			<option>已婚</option>
+        			<option>未婚</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">籍贯：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="JG" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">户口所在地：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="HKSZD" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">居住地电话：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="home_phone" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">个人电话：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="cell_phone" class="form-control">
+    				</div>
+  					</div>
+  					</form>
+  					</div>
+  		<div class="col-md-4 col-md-offset-2">
+  		<p>image</p>
+  		</div>
+  	</div>
+
+ 	<div class="row">
+		<div class="col-md-10">
+			<hr style=" height:2px;border:none;border-top:2px solid #185598;" />
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-5">
+				<form class="form-horizontal">
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">参加工作时间：</label>
+    				<div class="col-sm-8">
+        			<input type="datetime" id="in_work_date" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">单位名称：</label>
+    				<div class="col-sm-8">
+        			<select id="company01" class="form-control">
+        			<option>唐山曹妃甸首源机械设备维修有限公司</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">在岗状态：</label>
+    				<div class="col-sm-8">
+        			<select id="job_status" class="form-control">
+        			<option>在岗</option>
+        			<option>待岗</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">部门：</label>
+    				<div class="col-sm-8">
+        			<select id="department" class="form-control">
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">岗位：</label>
+    				<div class="col-sm-8">
+        			<select id="job_name" class="form-control">
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">加入公司时间：</label>
+    				<div class="col-sm-8">
+        			<input type="datetime" id="in_company_date" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">劳务派遣公司：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="LWPQGS" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">集团部门：</label>
+    				<div class="col-sm-8">
+        			<select id="JT_department" class="form-control">
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">人员序列：</label>
+    				<div class="col-sm-8">
+        			<select id="RYXL" class="form-control">
+        			<option>生产操作</option>
+        			<option>劳务岗位</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">联系人姓名：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="conn_name" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">联系人电话：</label>
+    				<div class="col-sm-8">
+        			<input type="text" id="conn_phone" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">津贴性质：</label>
+    				<div class="col-sm-8">
+        			<select id="JTXZ" class="form-control">
+        			<option>有毒有害</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">享受标准：</label>
+    				<div class="col-sm-8">
+        			<select id="XSBZ" class="form-control">
+        			<option>按出勤天数</option>
+        			</select>
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">工作班制：</label>
+    				<div class="col-sm-8">
+        			<select id="GZBZ" class="form-control">
+        			<option>倒班</option>
+        			<option>白班</option>
+        			</select>
+    				</div>
+  					</div>
+  				</form>
+  		</div>
+  		<div class="col-md-5">
+  				<form class="form-horizontal">
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">基本工资：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="base_salary" class="form-control" value="">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">高温津贴基准：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="high_temp_base" class="form-control" value="">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">特殊岗位津贴基准：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="special_job_base" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">夜班工资基准：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="night_job_base" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">班组长津贴：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="leader_salary" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">年工工资：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="age_salary" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">饭补基准：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="meal_base" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">环境补贴：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="env_salary" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">社保基数：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="SB_base" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">医保基数：</label>
+    				<div class="col-sm-8">
+        			<input type="number" id="YB_base" class="form-control">
+    				</div>
+  					</div>
+  					<div class="form-group">
+    				<label class="col-sm-4 control-label">工资计算法则切换：</label>
+    				<div class="col-sm-8">
+        			<select id="switch" class="form-control">
+        			<option>0</option>
+        			<option>1</option>
+        			<option>2</option>
+        			</select>
+    				</div>
+  					</div>
+  				</form>
+  		</div>
+  	</div>
+  	<div class="row">
+		<div class="col-md-10">
+			<hr style=" height:2px;border:none;border-top:2px solid #185598;" />
+		</div>
+	</div>
+  	<div class="row">
+  		<div class="col-md-4">
+      	<form>
+      	<div class="form-group">
+        <label>家庭地址1</label>
+        <textarea class="form-control" rows="3" id="home_add1"></textarea>
+      	</div>
+      	</form>
+    	</div>
+    	<div class="col-md-4">
+      	<form>
+      	<div class="form-group">
+        <label>家庭地址2</label>
+        <textarea class="form-control" rows="3" id="home_add2"></textarea>
+      	</div>
+      	</form>
+    	</div>
+    	<div class="col-md-4">
+      	<form>
+      	<div class="form-group">
+        <label>备注说明</label>
+        <textarea class="form-control" rows="3" id="other"></textarea>
+      	</div>
+      	</form>
+    	</div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-2">
+  			<button class="btn btn-success" id="return">返回</button>
+  		</div>
+  	</div>
+
+
+
+</div>
+{% endblock%}
+
+{% block js %}
+<script>
+function getdepart(){
+	$.getJSON('/common/set/depart_get',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<option>'+val[1]+'</option>'
+		})
+		//console.log(str)
+		$('#department').html(str)
+		$('#JT_department').html(str)
+	})
+}
+getdepart()
+
+function getjob(){
+	$.getJSON('/common/set/jobget',function(res){
+		var str = ''
+		$.each(res,function(ind,val){
+			str += '<option>'+val[1]+'</option>'
+		})
+		//console.log(str)
+		$('#job_name').html(str)
+	})
+}
+getjob()
+
+$.getJSON('/common/stuff/update/before',function(res){
+	tuple=res[0]
+	$('#name').val(tuple[0])
+	$('#pre_name').val(tuple[1]);$('#sex').val(tuple[2]);$('#MZ').val(tuple[3]);$('#id').val(tuple[4]);$('#ZZMM').val(tuple[5])
+	$('#learn').val(tuple[6]);$('#health').val(tuple[7]);$('#HKLB').val(tuple[8]);$('#merriage').val(tuple[9]);
+	$('#JG').val(tuple[10])
+	$('#HKSZD').val(tuple[11]);$('#home_phone').val(tuple[12]);$('#cell_phone').val(tuple[13]);$('#in_work_date').val(tuple[14]);
+	$('#home_add1').val(tuple[15])
+	$('#home_add2').val(tuple[16]);$('#company01').val(tuple[17]);$('#job_status').val(tuple[18]);$('#department').val(tuple[19]);
+	$('#job_name').val(tuple[20])
+	$('#in_company_date').val(tuple[21]);$('#LWPQGS').val(tuple[22]);$('#JT_department').val(tuple[23]);$('#RYXL').val(tuple[24]);
+	$('#conn_name').val(tuple[25])
+	$('#conn_phone').val(tuple[26]);$('#JTXZ').val(tuple[27]);$('#XSBZ').val(tuple[28]);$('#GZBZ').val(tuple[29]);
+	$('#base_salary').val(tuple[30])
+	$('#high_temp_base').val(tuple[31]);$('#special_job_base').val(tuple[32]);$('#night_job_base').val(tuple[33]);
+	$('#leader_salary').val(tuple[34]);$('#age_salary').val(tuple[35])
+	$('#meal_base').val(tuple[36]);$('#env_salary').val(tuple[37]);$('#SB_base').val(tuple[38]);$('#YB_base').val(tuple[39]);
+	$('#switch').val(tuple[40])
+	$('#other').val(tuple[41])
+})
+$('#in_work_date').datetimepicker({
+	language:'zh-CN',
+    format:'yyyy-mm',
+    todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 2,
+    });
+$('#in_company_date').datetimepicker({
+	language:'zh-CN',
+    format:'yyyy-mm',
+    todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 2,
+    });
+//var dict = {}
+$('.form-control').on('change',function(){
+	var id = $(this).attr('id')
+	var val = $(this).val()
+	//dict[id] = val
+	$.post('/common/stuff/update/on',{'01':id+':'+val},function(res){
+		if(res=='ok'){alert('修改成功')}
+		else{alert('修改失败')}
+	})
+})
+$('#return').on('click',function(){
+	location.href='/common/stuff'
+})
+
+</script>
+{% endblock %}
